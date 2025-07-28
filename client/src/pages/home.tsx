@@ -11,7 +11,9 @@ import {
   Brain, 
   Briefcase, 
   Send,
-  LogIn
+  LogIn,
+  Menu,
+  X
 } from "lucide-react";
 
 type Mode = "text" | "voice" | "mira" | "detector" | "neural";
@@ -20,6 +22,7 @@ export default function Home() {
   const [activeMode, setActiveMode] = useState<Mode>("text");
   const [searchQuery, setSearchQuery] = useState("");
   const [inputMessage, setInputMessage] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const modes = [
     { id: "text" as Mode, label: "TEXT", icon: Keyboard },
@@ -44,17 +47,49 @@ export default function Home() {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-[var(--askmira-dark-300)] to-[var(--askmira-dark-400)] text-white">
+      {/* Mobile Menu Button */}
+      <Button
+        className="fixed top-4 left-4 z-50 md:hidden p-2"
+        style={{ backgroundColor: "var(--askmira-dark-200)" }}
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </Button>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-70 flex flex-col" style={{ 
-        backgroundColor: "var(--askmira-dark-200)", 
-        borderRight: "1px solid var(--askmira-dark-100)" 
-      }}>
+      <div 
+        className={`
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+          md:translate-x-0 
+          fixed md:relative 
+          z-40 
+          w-80 md:w-70 
+          flex flex-col 
+          h-full 
+          transition-transform duration-300 ease-in-out
+        `}
+        style={{ 
+          backgroundColor: "var(--askmira-dark-200)", 
+          borderRight: "1px solid var(--askmira-dark-100)" 
+        }}
+      >
         {/* New Chat Button */}
-        <div className="p-4">
+        <div className="p-4 pt-16 md:pt-4">
           <Button 
             className="askmira-sidebar-btn w-full flex items-center justify-center gap-2 px-4 py-3 font-medium"
             style={{ backgroundColor: "var(--askmira-dark-100)" }}
-            onClick={() => console.log("New chat created")}
+            onClick={() => {
+              console.log("New chat created");
+              setSidebarOpen(false);
+            }}
           >
             <Plus className="h-4 w-4" />
             New Chat
@@ -64,7 +99,7 @@ export default function Home() {
         {/* Search Bar */}
         <div className="px-4 pb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: "var(--askmira-text-muted)" }} />
+            <Search className="absolute left-7 top-1/2 transform -translate-y-1/2 h-4 w-4" style={{ color: "var(--askmira-text-muted)" }} />
             <Input
               type="text"
               placeholder="Search chats..."
@@ -90,7 +125,10 @@ export default function Home() {
               backgroundColor: "var(--askmira-primary)", 
               color: "var(--askmira-dark-400)" 
             }}
-            onClick={() => console.log("Sign in clicked")}
+            onClick={() => {
+              console.log("Sign in clicked");
+              setSidebarOpen(false);
+            }}
           >
             <LogIn className="mr-2 h-4 w-4" />
             Sign In
@@ -99,53 +137,67 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-center py-6">
-          <h1 className="text-4xl font-bold" style={{ color: "var(--askmira-primary)" }}>
+        <div className="flex items-center justify-center py-6 px-4">
+          <h1 className="text-2xl md:text-4xl font-bold text-center" style={{ color: "var(--askmira-primary)" }}>
             AskMira
           </h1>
         </div>
 
         {/* Toggle Buttons */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          {modes.map((mode) => {
-            const IconComponent = mode.icon;
-            const isActive = activeMode === mode.id;
-            
-            return (
-              <button
-                key={mode.id}
-                onClick={() => setActiveMode(mode.id)}
-                className={`askmira-toggle-btn ${isActive ? 'active' : ''}`}
-                style={{
-                  color: isActive ? "var(--askmira-primary)" : "var(--askmira-text-muted)",
-                  borderColor: isActive ? "var(--askmira-primary)" : "var(--askmira-border)",
-                  backgroundColor: isActive ? "rgba(0, 212, 170, 0.2)" : "transparent"
-                }}
-              >
-                <IconComponent className="mr-2 h-4 w-4" />
-                {mode.label}
-              </button>
-            );
-          })}
+        <div className="flex items-center justify-center gap-1 sm:gap-2 lg:gap-4 mb-6 md:mb-8 px-2 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1 sm:gap-2 lg:gap-4">
+            {modes.map((mode) => {
+              const IconComponent = mode.icon;
+              const isActive = activeMode === mode.id;
+              
+              return (
+                <button
+                  key={mode.id}
+                  onClick={() => setActiveMode(mode.id)}
+                  className={`
+                    askmira-toggle-btn 
+                    ${isActive ? 'active' : ''} 
+                    whitespace-nowrap 
+                    text-xs sm:text-sm 
+                    px-2 sm:px-4 lg:px-6 
+                    py-2 
+                    flex-shrink-0
+                  `}
+                  style={{
+                    color: isActive ? "var(--askmira-primary)" : "var(--askmira-text-muted)",
+                    borderColor: isActive ? "var(--askmira-primary)" : "var(--askmira-border)",
+                    backgroundColor: isActive ? "rgba(0, 212, 170, 0.2)" : "transparent"
+                  }}
+                >
+                  <IconComponent className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">{mode.label}</span>
+                  <span className="sm:hidden">
+                    {mode.label === "AI DETECTOR" ? "AI" : 
+                     mode.label === "NEURAL LINK" ? "NEURAL" : mode.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex items-center justify-center px-8">
+        <div className="flex-1 flex items-center justify-center px-4 sm:px-8">
           <div 
-            className="askmira-upload-area w-full max-w-2xl h-64 flex flex-col items-center justify-center"
+            className="askmira-upload-area w-full max-w-2xl h-48 sm:h-64 flex flex-col items-center justify-center"
             onClick={() => console.log("Upload area clicked")}
           >
-            <Briefcase className="h-16 w-16 mb-4" style={{ color: "var(--askmira-text-muted)" }} />
-            <p className="text-lg" style={{ color: "var(--askmira-text-muted)" }}>
+            <Briefcase className="h-12 w-12 sm:h-16 sm:w-16 mb-4" style={{ color: "var(--askmira-text-muted)" }} />
+            <p className="text-sm sm:text-lg text-center px-4" style={{ color: "var(--askmira-text-muted)" }}>
               Initialize Neural Connection or Upload Data Package
             </p>
           </div>
         </div>
 
         {/* Input Area */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="max-w-4xl mx-auto relative">
             <Input
               type="text"
@@ -153,17 +205,17 @@ export default function Home() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="askmira-input w-full pl-6 pr-16 py-4 rounded-2xl text-lg placeholder:text-[var(--askmira-text-muted)]"
+              className="askmira-input w-full pl-4 sm:pl-6 pr-12 sm:pr-16 py-3 sm:py-4 rounded-2xl text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)]"
             />
             <Button
               onClick={handleSendMessage}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 p-3 rounded-xl transition-all duration-200 hover:opacity-90"
+              className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-2 sm:p-3 rounded-xl transition-all duration-200 hover:opacity-90"
               style={{ 
                 backgroundColor: "var(--askmira-primary)", 
                 color: "var(--askmira-dark-400)" 
               }}
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>

@@ -113,4 +113,39 @@
     @apply border-primary;
     box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.1);
   }
+
+  /* Responsive utilities */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile-specific adjustments */
+  @media (max-width: 768px) {
+    .askmira-toggle-btn {
+      @apply px-2 py-2 text-xs;
+    }
+    
+    .askmira-upload-area {
+      @apply h-48 mx-2;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .askmira-toggle-btn {
+      @apply px-4 py-2 text-sm;
+    }
+  }
+
+  /* Large screen optimizations */
+  @media (min-width: 1440px) {
+    .askmira-upload-area {
+      @apply max-w-3xl;
+    }
+  }
 }
