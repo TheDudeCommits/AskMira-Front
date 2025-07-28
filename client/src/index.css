@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+
+  /* AskMira Custom Colors */
+  --askmira-primary: hsl(168, 100%, 42%); /* #00D4AA */
+  --askmira-dark-100: hsl(0, 0%, 16.5%); /* #2A2A2A */
+  --askmira-dark-200: hsl(0, 0%, 10.2%); /* #1A1A1A */
+  --askmira-dark-300: hsl(208, 30%, 8%); /* #0F1419 */
+  --askmira-dark-400: hsl(0, 0%, 0%); /* #000000 */
+  --askmira-border: hsl(0, 0%, 20%); /* #333333 */
+  --askmira-text-muted: hsl(0, 0%, 60%); /* #999999 */
+}
+
+.dark {
+  --background: hsl(208, 30%, 8%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(0, 0%, 16.5%);
+  --muted-foreground: hsl(0, 0%, 60%);
+  --popover: hsl(0, 0%, 10.2%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(0, 0%, 10.2%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(0, 0%, 20%);
+  --input: hsl(0, 0%, 16.5%);
+  --primary: hsl(168, 100%, 42%);
+  --primary-foreground: hsl(0, 0%, 0%);
+  --secondary: hsl(0, 0%, 16.5%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(0, 0%, 16.5%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 0%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased text-foreground;
+    background: linear-gradient(135deg, var(--askmira-dark-300) 0%, var(--askmira-dark-400) 100%);
+    min-height: 100vh;
+  }
+
+  html {
+    @apply dark;
+  }
+}
+
+@layer components {
+  .askmira-sidebar-btn {
+    @apply transition-all duration-200 hover:bg-white/5;
+  }
+
+  .askmira-toggle-btn {
+    @apply transition-all duration-200 border border-border rounded-full px-6 py-2 text-sm font-medium;
+  }
+
+  .askmira-toggle-btn:hover {
+    @apply border-primary;
+    background-color: rgba(0, 212, 170, 0.1);
+  }
+
+  .askmira-toggle-btn.active {
+    @apply border-primary text-primary;
+    background-color: rgba(0, 212, 170, 0.2);
+  }
+
+  .askmira-upload-area {
+    @apply transition-all duration-300 border-2 border-dashed border-border rounded-xl cursor-pointer;
+    background: rgba(42, 42, 42, 0.5);
+  }
+
+  .askmira-upload-area:hover {
+    border-color: rgba(0, 212, 170, 0.5);
+    background: rgba(0, 212, 170, 0.05);
+  }
+
+  .askmira-input {
+    @apply transition-all duration-200 outline-none;
+    background: rgba(42, 42, 42, 0.8);
+    border: 1px solid var(--askmira-border);
+  }
+
+  .askmira-input:focus {
+    @apply border-primary;
+    box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.1);
+  }
+}
