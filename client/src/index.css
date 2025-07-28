@@ -63,7 +63,8 @@
   }
 
   body {
-    @apply font-sans antialiased text-foreground;
+    @apply antialiased text-foreground;
+    font-family: 'Titillium Web', sans-serif;
     background: linear-gradient(135deg, var(--askmira-dark-300) 0%, var(--askmira-dark-400) 100%);
     min-height: 100vh;
   }
