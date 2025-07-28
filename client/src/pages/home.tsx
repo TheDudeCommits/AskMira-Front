@@ -168,9 +168,7 @@ export default function Home() {
                     items-center
                   `}
                   style={{
-                    color: isActive ? "var(--askmira-primary)" : "var(--askmira-text-muted)",
-                    borderColor: isActive ? "var(--askmira-primary)" : "var(--askmira-border)",
-                    backgroundColor: isActive ? "rgba(0, 212, 170, 0.2)" : "transparent"
+                    color: isActive ? "var(--askmira-primary)" : "rgba(255, 255, 255, 0.7)"
                   }}
                 >
                   <IconComponent className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
