@@ -4,11 +4,11 @@ import { Input } from "@/components/ui/input";
 import { 
   Plus, 
   Search, 
-  Keyboard, 
+  MessageSquare, 
   Mic, 
   Bot, 
-  SearchCheck, 
-  Brain, 
+  Shield, 
+  Wifi, 
   Briefcase, 
   Send,
   LogIn,
@@ -25,11 +25,11 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const modes = [
-    { id: "text" as Mode, label: "TEXT", icon: Keyboard },
+    { id: "text" as Mode, label: "TEXT", icon: MessageSquare },
     { id: "voice" as Mode, label: "VOICE", icon: Mic },
     { id: "mira" as Mode, label: "MIRA", icon: Bot },
-    { id: "detector" as Mode, label: "AI DETECTOR", icon: SearchCheck },
-    { id: "neural" as Mode, label: "NEURAL LINK", icon: Brain },
+    { id: "detector" as Mode, label: "AI DETECTOR", icon: Shield },
+    { id: "neural" as Mode, label: "NEURAL LINK", icon: Wifi },
   ];
 
   const handleSendMessage = () => {
@@ -164,6 +164,8 @@ export default function Home() {
                     px-2 sm:px-4 lg:px-6 
                     py-2 
                     flex-shrink-0
+                    flex
+                    items-center
                   `}
                   style={{
                     color: isActive ? "var(--askmira-primary)" : "var(--askmira-text-muted)",
@@ -171,7 +173,7 @@ export default function Home() {
                     backgroundColor: isActive ? "rgba(0, 212, 170, 0.2)" : "transparent"
                   }}
                 >
-                  <IconComponent className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                  <IconComponent className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                   <span className="hidden sm:inline">{mode.label}</span>
                   <span className="sm:hidden">
                     {mode.label === "AI DETECTOR" ? "AI" : 
