@@ -205,13 +205,12 @@ export default function Home() {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="askmira-input w-full pl-4 sm:pl-6 pr-12 sm:pr-16 py-3 sm:py-4 rounded-2xl text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)]"
+              className="askmira-input w-full pl-4 sm:pl-6 pr-12 sm:pr-16 py-3 sm:py-4 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)]"
             />
             <Button
               onClick={handleSendMessage}
-              className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-2 sm:p-3 rounded-xl transition-all duration-200 hover:opacity-90"
+              className="askmira-send-btn absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-2 sm:p-3"
               style={{ 
-                backgroundColor: "var(--askmira-primary)", 
                 color: "var(--askmira-dark-400)" 
               }}
             >
