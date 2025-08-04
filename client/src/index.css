@@ -394,6 +394,37 @@
     opacity: 1;
   }
 
+  .status-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .status-dot {
+    width: 4px;
+    height: 4px;
+    background: rgba(0, 212, 170, 0.6);
+    border-radius: 50%;
+    animation: statusDotPulse 1.5s ease-in-out infinite;
+  }
+
+  .status-dot:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+
+  .status-dot:nth-child(3) {
+    animation-delay: 0.6s;
+  }
+
+  @keyframes statusDotPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
   /* Futuristic Sidebar Styles */
   .futuristic-sidebar {
     background: linear-gradient(180deg, 

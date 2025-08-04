@@ -324,7 +324,7 @@ export default function Home() {
 
               <Input
                 type="text"
-                placeholder="▶ Enter neural transmission..."
+                placeholder="Enter neural transmission"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -334,6 +334,12 @@ export default function Home() {
                   textShadow: '0 0 15px rgba(0, 212, 170, 0.4)'
                 }}
               />
+              
+              <div className="status-dots">
+                <div className="status-dot"></div>
+                <div className="status-dot"></div>
+                <div className="status-dot"></div>
+              </div>
               
               <Button
                 onClick={handleSendMessage}
