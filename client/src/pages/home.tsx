@@ -21,6 +21,27 @@ import backgroundVideo from "@assets/Header Minimal (1)_1754338987422.mp4";
 
 type Mode = "text" | "voice" | "mira" | "detector";
 
+// Message formatting function for better readability
+const formatMessage = (text: string): string => {
+  return text
+    // Convert double asterisks to bold
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--askmira-primary); font-weight: 600;">$1</strong>')
+    // Convert single asterisks to italic
+    .replace(/\*(.*?)\*/g, '<em style="color: var(--askmira-text); font-style: italic;">$1</em>')
+    // Convert numbered lists
+    .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="margin: 8px 0; padding-left: 8px;"><span style="color: var(--askmira-primary); font-weight: bold;">$1.</span> $2</div>')
+    // Convert bullet points
+    .replace(/^[-•*]\s+(.+)$/gm, '<div style="margin: 4px 0; padding-left: 8px;"><span style="color: var(--askmira-primary);">•</span> $1</div>')
+    // Convert double line breaks to paragraph breaks
+    .replace(/\n\n/g, '</p><p style="margin: 12px 0;">')
+    // Convert single line breaks to br tags
+    .replace(/\n/g, '<br/>')
+    // Wrap in paragraph tags if content exists
+    .replace(/^(.+)/, '<p style="margin: 0;">$1</p>')
+    // Clean up empty paragraphs
+    .replace(/<p[^>]*><\/p>/g, '');
+};
+
 export default function Home() {
   const [activeMode, setActiveMode] = useState<Mode>("text");
   const [searchQuery, setSearchQuery] = useState("");
@@ -398,19 +419,26 @@ export default function Home() {
                       className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       <div 
-                        className={`max-w-xs sm:max-w-md lg:max-w-lg px-4 py-3 rounded-lg font-mono text-sm ${
+                        className={`max-w-xs sm:max-w-md lg:max-w-lg px-4 py-3 rounded-lg text-sm ${
                           message.isUser 
-                            ? 'bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white' 
+                            ? 'bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono' 
                             : 'bg-[rgba(26,26,26,0.6)] border border-[rgba(0,212,170,0.2)] text-[var(--askmira-text)]'
                         }`}
                         style={{
                           backdropFilter: 'blur(10px)',
                           boxShadow: message.isUser 
                             ? '0 4px 15px rgba(0, 212, 170, 0.3)' 
-                            : '0 4px 15px rgba(0, 0, 0, 0.2)'
+                            : '0 4px 15px rgba(0, 0, 0, 0.2)',
+                          lineHeight: '1.6',
+                          whiteSpace: 'pre-wrap'
                         }}
                       >
-                        {message.text}
+                        <div 
+                          className={`message-content ${message.isUser ? 'font-mono' : 'font-sans'}`}
+                          dangerouslySetInnerHTML={{ 
+                            __html: formatMessage(message.text) 
+                          }}
+                        />
                       </div>
                     </div>
                   ))

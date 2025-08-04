@@ -462,6 +462,37 @@
     background: rgba(0, 212, 170, 0.5);
   }
 
+  /* Enhanced message formatting styles */
+  .message-content {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .message-content strong {
+    color: var(--askmira-primary);
+    font-weight: 600;
+    text-shadow: 0 0 8px rgba(0, 212, 170, 0.3);
+  }
+
+  .message-content em {
+    color: var(--askmira-text);
+    font-style: italic;
+    opacity: 0.9;
+  }
+
+  .message-content p {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .message-content p + p {
+    margin-top: 12px;
+  }
+
+  .message-content div {
+    line-height: 1.5;
+  }
+
   /* Futuristic Sidebar Styles */
   .futuristic-sidebar {
     background: linear-gradient(180deg, 
