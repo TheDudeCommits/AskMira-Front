@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -26,6 +26,7 @@ export default function Home() {
   const [inputMessage, setInputMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [latency, setLatency] = useState(12);
 
   const modes = [
     { id: "text" as Mode, label: "TEXT", icon: MessageSquare },
@@ -34,6 +35,25 @@ export default function Home() {
     { id: "detector" as Mode, label: "AI DETECTOR", icon: Shield },
     { id: "neural" as Mode, label: "NEURAL LINK", icon: Wifi },
   ];
+
+  // Random latency animation
+  useEffect(() => {
+    const updateLatency = () => {
+      // Generate random number between 6 and 36
+      const newLatency = Math.floor(Math.random() * (36 - 6 + 1)) + 6;
+      setLatency(newLatency);
+      
+      // Set next random interval between 1.5 and 6 seconds
+      const nextInterval = Math.random() * (6000 - 1500) + 1500;
+      setTimeout(updateLatency, nextInterval);
+    };
+
+    // Start the first update after a random initial delay
+    const initialDelay = Math.random() * 2000 + 1000;
+    const timeoutId = setTimeout(updateLatency, initialDelay);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   const handleSendMessage = () => {
     if (inputMessage.trim()) {
@@ -340,7 +360,7 @@ export default function Home() {
 
             {/* Connection Status Footer */}
             <div className="flex items-center justify-center mt-3 space-x-4 text-xs font-mono text-[var(--askmira-text-muted)] opacity-40">
-              <span>LATENCY: 12ms</span>
+              <span>LATENCY: {latency}ms</span>
               <span>•</span>
               <span>ENCRYPTION: AES-256</span>
               <span>•</span>
