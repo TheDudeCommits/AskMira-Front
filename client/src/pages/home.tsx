@@ -107,9 +107,7 @@ export default function Home() {
                   NEURAL CHAT SYSTEM
                 </span>
               </div>
-              <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50 mb-4">
-                [INTERFACE_v2.1.0]
-              </div>
+              
             </div>
 
             {/* New Chat Button */}
