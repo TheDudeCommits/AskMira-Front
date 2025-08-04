@@ -309,7 +309,6 @@ export default function Home() {
             {/* Status Bar */}
             <div className="flex items-center justify-between mb-3 px-2">
               <div className="flex items-center space-x-3">
-                <div className="input-status-indicator"></div>
                 <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">
                   NEURAL LINK ESTABLISHED
                 </span>
