@@ -314,7 +314,7 @@ export default function Home() {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="askmira-input w-full pl-6 sm:pl-8 pr-14 sm:pr-16 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide border-0 bg-transparent"
+                className="askmira-input w-full pl-6 sm:pl-8 pr-12 sm:pr-14 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide border-0 bg-transparent"
                 style={{ 
                   letterSpacing: '0.5px',
                   textShadow: '0 0 15px rgba(0, 212, 170, 0.4)'
@@ -323,12 +323,12 @@ export default function Home() {
               
               <Button
                 onClick={handleSendMessage}
-                className="askmira-send-btn absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 p-2.5 sm:p-3"
+                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-2 sm:p-2.5"
                 style={{ 
                   color: "var(--askmira-dark-400)" 
                 }}
               >
-                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
               
               {/* Enhanced corner indicators */}
