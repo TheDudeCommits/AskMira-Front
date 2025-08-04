@@ -24,11 +24,11 @@
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
 
-  /* AskMira Custom Colors */
-  --askmira-primary: hsl(168, 100%, 42%); /* #00D4AA */
+  /* AskMira Custom Colors - Monotone Palette */
+  --askmira-primary: hsl(0, 0%, 85%); /* Light gray accent */
   --askmira-dark-100: hsl(0, 0%, 16.5%); /* #2A2A2A */
   --askmira-dark-200: hsl(0, 0%, 10.2%); /* #1A1A1A */
-  --askmira-dark-300: hsl(208, 30%, 8%); /* #0F1419 */
+  --askmira-dark-300: hsl(0, 0%, 8%); /* Dark gray */
   --askmira-dark-400: hsl(0, 0%, 0%); /* #000000 */
   --askmira-border: hsl(0, 0%, 20%); /* #333333 */
   --askmira-text-muted: hsl(0, 0%, 60%); /* #999999 */
@@ -45,7 +45,7 @@
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(0, 0%, 20%);
   --input: hsl(0, 0%, 16.5%);
-  --primary: hsl(168, 100%, 42%);
+  --primary: hsl(0, 0%, 85%);
   --primary-foreground: hsl(0, 0%, 0%);
   --secondary: hsl(0, 0%, 16.5%);
   --secondary-foreground: hsl(0, 0%, 98%);
@@ -413,9 +413,9 @@
     width: 1px;
     background: linear-gradient(180deg, 
       transparent 0%, 
-      rgba(0, 212, 170, 0.3) 20%, 
-      rgba(0, 212, 170, 0.5) 50%, 
-      rgba(0, 212, 170, 0.3) 80%, 
+      rgba(217, 217, 217, 0.3) 20%, 
+      rgba(217, 217, 217, 0.5) 50%, 
+      rgba(217, 217, 217, 0.3) 80%, 
       transparent 100%);
     animation: sidebarGlow 3s ease-in-out infinite;
   }
@@ -427,9 +427,9 @@
 
   .neural-chat-btn {
     background: linear-gradient(135deg, 
-      rgba(0, 212, 170, 0.1) 0%, 
-      rgba(0, 212, 170, 0.05) 100%);
-    border: 1px solid rgba(0, 212, 170, 0.2);
+      rgba(217, 217, 217, 0.1) 0%, 
+      rgba(217, 217, 217, 0.05) 100%);
+    border: 1px solid rgba(217, 217, 217, 0.2);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     position: relative;
@@ -445,7 +445,7 @@
     height: calc(100% + 4px);
     background: linear-gradient(90deg, 
       transparent, 
-      rgba(0, 212, 170, 0.2), 
+      rgba(217, 217, 217, 0.2), 
       transparent);
     transition: left 0.5s ease;
   }
@@ -455,28 +455,28 @@
   }
 
   .neural-chat-btn:hover {
-    border-color: rgba(0, 212, 170, 0.4);
-    box-shadow: 0 4px 20px rgba(0, 212, 170, 0.1);
+    border-color: rgba(217, 217, 217, 0.4);
+    box-shadow: 0 4px 20px rgba(217, 217, 217, 0.1);
     transform: translateY(-1px);
   }
 
   .neural-search {
     background: rgba(26, 26, 26, 0.6);
-    border: 1px solid rgba(0, 212, 170, 0.15);
+    border: 1px solid rgba(217, 217, 217, 0.15);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
   }
 
   .neural-search:focus-within {
-    border-color: rgba(0, 212, 170, 0.3);
-    box-shadow: 0 0 20px rgba(0, 212, 170, 0.05);
+    border-color: rgba(217, 217, 217, 0.3);
+    box-shadow: 0 0 20px rgba(217, 217, 217, 0.05);
   }
 
   .neural-signin-btn {
     background: linear-gradient(135deg, 
-      rgba(0, 212, 170, 0.9) 0%, 
-      rgba(0, 180, 144, 0.9) 100%);
-    border: 1px solid rgba(0, 212, 170, 0.3);
+      rgba(217, 217, 217, 0.9) 0%, 
+      rgba(190, 190, 190, 0.9) 100%);
+    border: 1px solid rgba(217, 217, 217, 0.3);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -502,7 +502,7 @@
 
   .neural-signin-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.2);
+    box-shadow: 0 8px 25px rgba(217, 217, 217, 0.2);
   }
 
   .sidebar-status-indicator {
