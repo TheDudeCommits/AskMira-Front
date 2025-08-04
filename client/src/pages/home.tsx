@@ -495,22 +495,6 @@ export default function Home() {
                 <div className="status-dot"></div>
               </div>
               
-              <Button
-                onClick={handleSendMessage}
-                disabled={isLoading || !inputMessage.trim()}
-                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-2 sm:p-2.5 disabled:opacity-50"
-                style={{ 
-                  color: "var(--askmira-dark-400)" 
-                }}
-                data-testid="button-send"
-              >
-                {isLoading ? (
-                  <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                )}
-              </Button>
-              
               {/* Enhanced corner indicators */}
               <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
               <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
