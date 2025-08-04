@@ -13,7 +13,9 @@ import {
   Send,
   LogIn,
   Menu,
-  X
+  X,
+  PanelLeftClose,
+  PanelLeftOpen
 } from "lucide-react";
 
 type Mode = "text" | "voice" | "mira" | "detector" | "neural";
@@ -23,6 +25,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [inputMessage, setInputMessage] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const modes = [
     { id: "text" as Mode, label: "TEXT", icon: MessageSquare },
@@ -66,6 +69,7 @@ export default function Home() {
       <div 
         className={`
           futuristic-sidebar
+          ${sidebarCollapsed && !sidebarOpen ? 'sidebar-collapsed' : ''}
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
           md:translate-x-0 
           fixed md:relative 
@@ -73,98 +77,117 @@ export default function Home() {
           w-80 md:w-70 
           flex flex-col 
           h-full 
-          transition-transform duration-300 ease-in-out
+          transition-all duration-300 ease-in-out
         `}
       >
+        {/* Collapse Button - Hidden on mobile */}
+        <Button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="collapse-btn hidden md:flex w-8 h-8 p-0 rounded-md border-0"
+          data-testid="button-collapse-sidebar"
+        >
+          {sidebarCollapsed ? (
+            <PanelLeftOpen className="collapse-btn-icon h-4 w-4" style={{ color: "var(--askmira-primary)" }} />
+          ) : (
+            <PanelLeftClose className="collapse-btn-icon h-4 w-4" style={{ color: "var(--askmira-primary)" }} />
+          )}
+        </Button>
+
         {/* Status indicator */}
         <div className="sidebar-status-indicator"></div>
 
-        {/* Header Section */}
-        <div className="p-4 pt-16 md:pt-6">
-          <div className="mb-4">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
-              <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">
-                NEURAL CHAT SYSTEM
-              </span>
+        {/* Main Content - wrapped for collapse animation */}
+        <div className="sidebar-content flex flex-col h-full">
+          {/* Header Section */}
+          <div className="p-4 pt-16 md:pt-6">
+            <div className="mb-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
+                <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">
+                  NEURAL CHAT SYSTEM
+                </span>
+              </div>
+              <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50 mb-4">
+                [INTERFACE_v2.1.0]
+              </div>
             </div>
-            <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50 mb-4">
-              [INTERFACE_v2.1.0]
-            </div>
-          </div>
 
-          {/* New Chat Button */}
-          <Button 
-            className="neural-chat-btn w-full flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-0"
-            onClick={() => {
-              console.log("New chat created");
-              setSidebarOpen(false);
-            }}
-          >
-            <Plus className="h-4 w-4" style={{ color: "var(--askmira-primary)" }} />
-            <span style={{ color: "var(--askmira-primary)" }}>New Neural Session</span>
-          </Button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="px-4 pb-4">
-          <div className="relative neural-search rounded-lg">
-            <Search 
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" 
-              style={{ color: "var(--askmira-text-muted)" }} 
-            />
-            <Input
-              type="text"
-              placeholder="▶ Search neural paths..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg placeholder:text-[var(--askmira-text-muted)] border-0 bg-transparent font-mono text-sm"
-              style={{ 
-                color: "rgba(255, 255, 255, 0.8)",
-                letterSpacing: '0.5px'
+            {/* New Chat Button */}
+            <Button 
+              className="neural-chat-btn w-full flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-0"
+              onClick={() => {
+                console.log("New chat created");
+                setSidebarOpen(false);
               }}
-            />
+              data-testid="button-new-chat"
+            >
+              <Plus className="h-4 w-4" style={{ color: "var(--askmira-primary)" }} />
+              <span style={{ color: "var(--askmira-primary)" }}>New Neural Session</span>
+            </Button>
           </div>
-        </div>
 
-        {/* Chat List Area */}
-        <div className="flex-1 px-4">
-          <div className="chat-list-empty p-6 text-center">
-            <div className="mb-3">
-              <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-gradient-to-br from-[var(--askmira-primary)] to-transparent opacity-20"></div>
-            </div>
-            <div className="text-xs font-mono tracking-wider" style={{ color: "var(--askmira-text-muted)" }}>
-              NO ACTIVE SESSIONS
-            </div>
-            <div className="text-xs font-mono mt-1 opacity-50" style={{ color: "var(--askmira-text-muted)" }}>
-              Initialize new connection
+          {/* Search Bar */}
+          <div className="px-4 pb-4">
+            <div className="relative neural-search rounded-lg">
+              <Search 
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4" 
+                style={{ color: "var(--askmira-text-muted)" }} 
+              />
+              <Input
+                type="text"
+                placeholder="▶ Search neural paths..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg placeholder:text-[var(--askmira-text-muted)] border-0 bg-transparent font-mono text-sm"
+                style={{ 
+                  color: "rgba(255, 255, 255, 0.8)",
+                  letterSpacing: '0.5px'
+                }}
+                data-testid="input-search"
+              />
             </div>
           </div>
-        </div>
 
-        {/* Sign In Button */}
-        <div className="p-4">
-          <Button 
-            className="neural-signin-btn w-full font-semibold py-3 rounded-lg border-0"
-            onClick={() => {
-              console.log("Sign in clicked");
-              setSidebarOpen(false);
-            }}
-          >
-            <LogIn 
-              className="mr-2 h-4 w-4" 
-              style={{ color: "var(--askmira-dark-400)" }} 
-            />
-            <span style={{ color: "var(--askmira-dark-400)" }}>
-              Neural Authentication
-            </span>
-          </Button>
-        </div>
+          {/* Chat List Area */}
+          <div className="flex-1 px-4">
+            <div className="chat-list-empty p-6 text-center">
+              <div className="mb-3">
+                <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-gradient-to-br from-[var(--askmira-primary)] to-transparent opacity-20"></div>
+              </div>
+              <div className="text-xs font-mono tracking-wider" style={{ color: "var(--askmira-text-muted)" }}>
+                NO ACTIVE SESSIONS
+              </div>
+              <div className="text-xs font-mono mt-1 opacity-50" style={{ color: "var(--askmira-text-muted)" }}>
+                Initialize new connection
+              </div>
+            </div>
+          </div>
 
-        {/* Footer Status */}
-        <div className="px-4 pb-3">
-          <div className="text-xs font-mono text-center text-[var(--askmira-text-muted)] opacity-30">
-            STATUS: OPERATIONAL
+          {/* Sign In Button */}
+          <div className="p-4">
+            <Button 
+              className="neural-signin-btn w-full font-semibold py-3 rounded-lg border-0"
+              onClick={() => {
+                console.log("Sign in clicked");
+                setSidebarOpen(false);
+              }}
+              data-testid="button-signin"
+            >
+              <LogIn 
+                className="mr-2 h-4 w-4" 
+                style={{ color: "var(--askmira-dark-400)" }} 
+              />
+              <span style={{ color: "var(--askmira-dark-400)" }}>
+                Neural Authentication
+              </span>
+            </Button>
+          </div>
+
+          {/* Footer Status */}
+          <div className="px-4 pb-3">
+            <div className="text-xs font-mono text-center text-[var(--askmira-text-muted)] opacity-30">
+              STATUS: OPERATIONAL
+            </div>
           </div>
         </div>
       </div>
