@@ -17,6 +17,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen
 } from "lucide-react";
+import backgroundVideo from "@assets/Header Minimal (1)_1754338987422.mp4";
 
 type Mode = "text" | "voice" | "mira" | "detector" | "neural";
 
@@ -184,7 +185,7 @@ export default function Home() {
           {/* Sign In Button */}
           <div className="p-4">
             <Button 
-              className="neural-signin-btn w-full font-semibold py-3 rounded-lg border-0"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-primary-foreground hover:bg-primary/90 h-10 px-4 neural-signin-btn w-full font-semibold py-3 rounded-lg border-0 bg-[#00d6ac]"
               onClick={() => {
                 console.log("Sign in clicked");
                 setSidebarOpen(false);
@@ -210,7 +211,19 @@ export default function Home() {
         </div>
       </div>
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative">
+        {/* Background Video */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-10 z-0"
+          src={backgroundVideo}
+        />
+        
+        {/* Content overlay */}
+        <div className="relative z-10 flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-center py-6 px-4">
           <h1 className="text-2xl md:text-4xl font-bold text-center" style={{ color: "var(--askmira-primary)" }}>
@@ -341,8 +354,6 @@ export default function Home() {
                 <div className="status-dot"></div>
               </div>
               
-              
-              
               {/* Enhanced corner indicators */}
               <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
               <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
@@ -359,6 +370,7 @@ export default function Home() {
               <span>BANDWIDTH: ∞</span>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </div>
