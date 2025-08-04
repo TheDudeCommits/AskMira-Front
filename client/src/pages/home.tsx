@@ -227,35 +227,67 @@ export default function Home() {
 
         {/* Input Area */}
         <div className="p-4 sm:p-6">
-          <div className="max-w-4xl mx-auto relative futuristic-input-container rounded-lg">
-            <div className="neural-grid"></div>
-            <Input
-              type="text"
-              placeholder="▶ NEURAL INTERFACE ACTIVE :: Enter transmission..."
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="askmira-input w-full pl-4 sm:pl-6 pr-12 sm:pr-16 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide"
-              style={{ 
-                letterSpacing: '0.5px',
-                textShadow: '0 0 10px rgba(0, 212, 170, 0.3)'
-              }}
-            />
-            <Button
-              onClick={handleSendMessage}
-              className="askmira-send-btn absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 p-2 sm:p-3"
-              style={{ 
-                color: "var(--askmira-dark-400)" 
-              }}
-            >
-              <Send className="h-4 w-4 sm:h-5 sm:w-5" />
-            </Button>
-            
-            {/* Holographic corner indicators */}
-            <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-50"></div>
-            <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-50"></div>
-            <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-50"></div>
-            <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-50"></div>
+          <div className="max-w-4xl mx-auto relative">
+            {/* Status Bar */}
+            <div className="flex items-center justify-between mb-3 px-2">
+              <div className="flex items-center space-x-3">
+                <div className="input-status-indicator"></div>
+                <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">
+                  NEURAL LINK ESTABLISHED
+                </span>
+              </div>
+              <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50">
+                [SECURE_CHANNEL]
+              </div>
+            </div>
+
+            {/* Input Container */}
+            <div className="futuristic-input-container rounded-xl">
+              <div className="neural-grid"></div>
+              
+              {/* Data stream indicator */}
+              <div className="data-stream">
+                &gt;&gt; DATA_STREAM_ACTIVE
+              </div>
+
+              <Input
+                type="text"
+                placeholder="▶ Enter neural transmission..."
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="askmira-input w-full pl-6 sm:pl-8 pr-14 sm:pr-16 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide border-0 bg-transparent"
+                style={{ 
+                  letterSpacing: '0.5px',
+                  textShadow: '0 0 15px rgba(0, 212, 170, 0.4)'
+                }}
+              />
+              
+              <Button
+                onClick={handleSendMessage}
+                className="askmira-send-btn absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 p-2.5 sm:p-3"
+                style={{ 
+                  color: "var(--askmira-dark-400)" 
+                }}
+              >
+                <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+              </Button>
+              
+              {/* Enhanced corner indicators */}
+              <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+              <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+              <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+              <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+            </div>
+
+            {/* Connection Status Footer */}
+            <div className="flex items-center justify-center mt-3 space-x-4 text-xs font-mono text-[var(--askmira-text-muted)] opacity-40">
+              <span>LATENCY: 12ms</span>
+              <span>•</span>
+              <span>ENCRYPTION: AES-256</span>
+              <span>•</span>
+              <span>BANDWIDTH: ∞</span>
+            </div>
           </div>
         </div>
       </div>
