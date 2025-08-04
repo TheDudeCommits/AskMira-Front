@@ -220,39 +220,83 @@ export default function Home() {
 
         {/* Toggle Buttons */}
         <div className="flex items-center justify-center gap-1 sm:gap-2 lg:gap-4 mb-6 md:mb-8 px-2 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-1 sm:gap-2 lg:gap-4">
-            {modes.map((mode) => {
-              const IconComponent = mode.icon;
-              const isActive = activeMode === mode.id;
-              
-              return (
-                <button
-                  key={mode.id}
-                  onClick={() => setActiveMode(mode.id)}
-                  className={`
-                    askmira-toggle-btn 
-                    ${isActive ? 'active' : ''} 
-                    whitespace-nowrap 
-                    text-xs sm:text-sm 
-                    px-2 sm:px-4 lg:px-6 
-                    py-2 
-                    flex-shrink-0
-                    flex
-                    items-center
-                  `}
-                  style={{
-                    color: isActive ? "var(--askmira-primary)" : "rgba(255, 255, 255, 0.7)"
-                  }}
-                >
-                  <IconComponent className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                  <span className="hidden sm:inline">{mode.label}</span>
-                  <span className="sm:hidden">
-                    {mode.label === "AI DETECTOR" ? "AI" : 
-                     mode.label === "NEURAL LINK" ? "NEURAL" : mode.label}
-                  </span>
-                </button>
-              );
-            })}
+          {/* Neural interface container */}
+          <div className="neural-toggle-container relative">
+            {/* Background pulse effect */}
+            <div className="neural-pulse-bg"></div>
+            
+            {/* Connection lines between buttons */}
+            <div className="neural-connections"></div>
+            
+            <div className="flex gap-1 sm:gap-2 lg:gap-3 relative z-10">
+              {modes.map((mode, index) => {
+                const IconComponent = mode.icon;
+                const isActive = activeMode === mode.id;
+                
+                return (
+                  <button
+                    key={mode.id}
+                    onClick={() => setActiveMode(mode.id)}
+                    className={`
+                      neural-mode-btn 
+                      ${isActive ? 'neural-active' : ''} 
+                      whitespace-nowrap 
+                      text-xs sm:text-sm 
+                      px-3 sm:px-4 lg:px-6 
+                      py-2.5 sm:py-3
+                      flex-shrink-0
+                      flex
+                      items-center
+                      relative
+                      group
+                    `}
+                    data-testid={`button-mode-${mode.id}`}
+                    style={{
+                      color: isActive ? "var(--askmira-primary)" : "rgba(255, 255, 255, 0.7)"
+                    }}
+                  >
+                    {/* Button neural grid overlay */}
+                    <div className="neural-btn-grid"></div>
+                    
+                    {/* Active state pulse */}
+                    {isActive && <div className="neural-active-pulse"></div>}
+                    
+                    {/* Data stream indicator */}
+                    <div className="neural-data-stream"></div>
+                    
+                    {/* Icon with enhanced glow */}
+                    <div className="relative flex items-center">
+                      <IconComponent className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0 transition-all duration-300 group-hover:scale-110" />
+                      {isActive && (
+                        <div className="absolute inset-0 blur-sm opacity-60">
+                          <IconComponent className="mr-1 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" style={{ color: "var(--askmira-primary)" }} />
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Text content */}
+                    <span className="hidden sm:inline font-mono tracking-wider relative z-10">{mode.label}</span>
+                    <span className="sm:hidden font-mono tracking-wider relative z-10">
+                      {mode.label === "AI DETECTOR" ? "AI" : 
+                       mode.label === "NEURAL LINK" ? "NEURAL" : mode.label}
+                    </span>
+                    
+                    {/* Corner accents */}
+                    <div className="neural-corners"></div>
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Status indicator */}
+            <div className="neural-status-bar">
+              <div className="status-dots">
+                <div className="status-dot"></div>
+                <div className="status-dot"></div>
+                <div className="status-dot"></div>
+              </div>
+              <span className="status-text">NEURAL_INTERFACE_ACTIVE</span>
+            </div>
           </div>
         </div>
 
