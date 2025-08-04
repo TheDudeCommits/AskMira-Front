@@ -83,7 +83,7 @@ export default function Home() {
         {/* Collapse Button - Hidden on mobile */}
         <Button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="collapse-btn hidden md:flex w-8 h-8 p-0 rounded-md border-0"
+          className="collapse-btn hidden md:flex w-8 h-8 p-0 rounded-md border-0 bg-[#17191b]"
           data-testid="button-collapse-sidebar"
         >
           {sidebarCollapsed ? (
