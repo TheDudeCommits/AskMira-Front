@@ -345,11 +345,11 @@ export default function Home() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 px-4 sm:px-8">
+        <div className="flex-1 px-4 sm:px-8 overflow-hidden">
           {activeMode === "text" ? (
             /* Chat Messages Area for Text Mode */
             <div className="max-w-4xl mx-auto h-full flex flex-col">
-              <div className="flex-1 overflow-y-auto py-4 space-y-4">
+              <div className="flex-1 overflow-y-auto py-4 space-y-4 max-h-[calc(100vh-280px)] chat-scroll">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full">
                     <div 
