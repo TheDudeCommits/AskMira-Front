@@ -352,20 +352,43 @@ export default function Home() {
               <div className="flex-1 overflow-y-auto py-4 space-y-4">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div className="relative mb-6">
-                        <Zap 
-                          className="h-12 w-12 mx-auto transition-all duration-500" 
-                          style={{ 
-                            color: "var(--askmira-primary)",
-                            filter: "drop-shadow(0 0 15px rgba(0, 212, 170, 0.3))"
-                          }} 
-                        />
+                    <div 
+                      className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group"
+                      onClick={() => console.log("Upload area clicked")}
+                    >
+                      {/* Neural connection grid background */}
+                      <div className="neural-connection-grid"></div>
+                      
+                      {/* Floating particles */}
+                      <div className="floating-particles"></div>
+                      
+                      {/* Main content */}
+                      <div className="relative z-10 flex flex-col items-center justify-center">
+                        <div className="relative mb-6">
+                          <Zap 
+                            className="h-16 w-16 sm:h-20 sm:w-20 transition-all duration-500 group-hover:scale-110" 
+                            style={{ 
+                              color: "var(--askmira-primary)",
+                              filter: "drop-shadow(0 0 20px rgba(0, 212, 170, 0.4))"
+                            }} 
+                          />
+                          {/* Icon glow effect */}
+                          <div className="absolute inset-0 h-16 w-16 sm:h-20 sm:w-20 bg-[var(--askmira-primary)] rounded-full opacity-20 blur-xl animate-pulse"></div>
+                        </div>
+                        
+                        <div className="text-center space-y-2">
+                          <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
+                            color: "var(--askmira-text-muted)",
+                            letterSpacing: "1px"
+                          }}>INITIALIZE CONNECTION OR UPLOAD DATA PACKAGE</p>
+                        </div>
                       </div>
-                      <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
-                        color: "var(--askmira-text-muted)",
-                        letterSpacing: "1px"
-                      }}>START NEURAL CONVERSATION</p>
+                      
+                      {/* Corner accent lines */}
+                      <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                      <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                      <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                      <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
                     </div>
                   </div>
                 ) : (
