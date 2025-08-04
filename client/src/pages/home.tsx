@@ -195,8 +195,7 @@ export default function Home() {
             {/* Floating particles */}
             <div className="floating-particles"></div>
             
-            {/* Pulse indicator */}
-            <div className="pulse-indicator"></div>
+
             
             {/* Main content */}
             <div className="relative z-10 flex flex-col items-center justify-center">
