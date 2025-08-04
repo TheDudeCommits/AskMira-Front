@@ -103,9 +103,6 @@ export default function Home() {
             <div className="mb-4">
               <div className="flex items-center space-x-2 mb-2">
                 <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
-                <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">
-                  NEURAL CHAT SYSTEM
-                </span>
               </div>
               
             </div>
