@@ -323,7 +323,7 @@ export default function Home() {
               
               <Button
                 onClick={handleSendMessage}
-                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-1.5 sm:p-2"
+                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-1 sm:p-1.5"
                 style={{ 
                   color: "var(--askmira-dark-400)" 
                 }}
