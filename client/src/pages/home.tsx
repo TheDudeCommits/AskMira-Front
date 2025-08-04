@@ -185,7 +185,7 @@ export default function Home() {
           {/* Sign In Button */}
           <div className="p-4">
             <Button 
-              className="neural-signin-btn w-full font-semibold py-3 rounded-lg border-0"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 text-primary-foreground hover:bg-primary/90 h-10 px-4 neural-signin-btn w-full font-semibold py-3 rounded-lg border-0 bg-[#1b2626]"
               onClick={() => {
                 console.log("Sign in clicked");
                 setSidebarOpen(false);
