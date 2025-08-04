@@ -213,12 +213,7 @@ export default function Home() {
               </div>
               
               <div className="text-center space-y-2">
-                <h3 className="text-lg sm:text-xl font-semibold tracking-wide" style={{ 
-                  color: "rgba(255, 255, 255, 0.9)",
-                  textShadow: "0 0 20px rgba(0, 212, 170, 0.3)"
-                }}>
-                  NEURAL INTERFACE
-                </h3>
+                
                 <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
                   color: "var(--askmira-text-muted)",
                   letterSpacing: "1px"
