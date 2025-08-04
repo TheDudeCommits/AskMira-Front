@@ -114,7 +114,7 @@ export default function Home() {
 
             {/* New Chat Button */}
             <Button 
-              className="neural-chat-btn w-full flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-0"
+              className="neural-chat-btn w-full flex items-center justify-center gap-2 px-4 py-3 font-medium rounded-lg border-0 bg-[#17191b]"
               onClick={() => {
                 console.log("New chat created");
                 setSidebarOpen(false);
