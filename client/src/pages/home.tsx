@@ -55,7 +55,6 @@ export default function Home() {
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>
-
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
@@ -63,7 +62,6 @@ export default function Home() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
       {/* Sidebar */}
       <div 
         className={`
@@ -135,7 +133,6 @@ export default function Home() {
           </Button>
         </div>
       </div>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
@@ -216,9 +213,7 @@ export default function Home() {
                 <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
                   color: "var(--askmira-text-muted)",
                   letterSpacing: "1px"
-                }}>
-                  ▶ INITIALIZE CONNECTION OR UPLOAD DATA PACKAGE
-                </p>
+                }}>INITIALIZE CONNECTION OR UPLOAD DATA PACKAGE</p>
               </div>
             </div>
             
