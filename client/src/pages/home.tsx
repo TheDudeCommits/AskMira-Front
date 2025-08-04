@@ -198,14 +198,19 @@ export default function Home() {
 
         {/* Input Area */}
         <div className="p-4 sm:p-6">
-          <div className="max-w-4xl mx-auto relative">
+          <div className="max-w-4xl mx-auto relative futuristic-input-container rounded-lg">
+            <div className="neural-grid"></div>
             <Input
               type="text"
-              placeholder="Enter neural data transmission..."
+              placeholder="▶ NEURAL INTERFACE ACTIVE :: Enter transmission..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="askmira-input w-full pl-4 sm:pl-6 pr-12 sm:pr-16 py-3 sm:py-4 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)]"
+              className="askmira-input w-full pl-4 sm:pl-6 pr-12 sm:pr-16 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide"
+              style={{ 
+                letterSpacing: '0.5px',
+                textShadow: '0 0 10px rgba(0, 212, 170, 0.3)'
+              }}
             />
             <Button
               onClick={handleSendMessage}
@@ -214,8 +219,14 @@ export default function Home() {
                 color: "var(--askmira-dark-400)" 
               }}
             >
-              <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+              <Send className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
+            
+            {/* Holographic corner indicators */}
+            <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-50"></div>
+            <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-50"></div>
+            <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-50"></div>
+            <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-50"></div>
           </div>
         </div>
       </div>
