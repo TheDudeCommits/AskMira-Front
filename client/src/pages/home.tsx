@@ -323,12 +323,12 @@ export default function Home() {
               
               <Button
                 onClick={handleSendMessage}
-                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-2 sm:p-2.5"
+                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-1.5 sm:p-2"
                 style={{ 
                   color: "var(--askmira-dark-400)" 
                 }}
               >
-                <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <Send className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </Button>
               
               {/* Enhanced corner indicators */}
