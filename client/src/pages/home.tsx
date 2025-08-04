@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -28,6 +28,9 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [latency, setLatency] = useState(12);
+  const [messages, setMessages] = useState<Array<{id: string, text: string, isUser: boolean, timestamp: Date}>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const modes = [
     { id: "text" as Mode, label: "TEXT", icon: MessageSquare },
@@ -55,15 +58,82 @@ export default function Home() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      console.log("Message sent:", inputMessage);
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // API function for sending messages to Mira
+  async function sendMessageToMira(message: string): Promise<string> {
+    try {
+      const response = await fetch("https://AskMira-Backend-Text.replit.app/api/text", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+
+      if (data.reply) {
+        return data.reply;
+      } else if (data.error) {
+        return "❌ Error: " + data.error;
+      } else {
+        return "❌ Unknown error occurred.";
+      }
+    } catch (error) {
+      return "❌ Network error: Unable to reach Mira backend.";
+    }
+  }
+
+  const handleSendMessage = async () => {
+    if (inputMessage.trim() && activeMode === "text" && !isLoading) {
+      const userMessage = inputMessage.trim();
+      const userMessageObj = {
+        id: Date.now().toString(),
+        text: userMessage,
+        isUser: true,
+        timestamp: new Date()
+      };
+      
+      // Add user message and clear input
+      setMessages(prev => [...prev, userMessageObj]);
+      setInputMessage("");
+      setIsLoading(true);
+      
+      try {
+        // Get AI response
+        const reply = await sendMessageToMira(userMessage);
+        const aiMessageObj = {
+          id: (Date.now() + 1).toString(),
+          text: reply,
+          isUser: false,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, aiMessageObj]);
+      } catch (error) {
+        const errorMessageObj = {
+          id: (Date.now() + 1).toString(),
+          text: "❌ Failed to send message. Please try again.",
+          isUser: false,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessageObj]);
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (inputMessage.trim() && activeMode !== "text") {
+      console.log("Sending message for mode:", activeMode, inputMessage);
       setInputMessage("");
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       handleSendMessage();
     }
   };
@@ -275,48 +345,114 @@ export default function Home() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex items-center justify-center px-4 sm:px-8">
-          <div 
-            className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group"
-            onClick={() => console.log("Upload area clicked")}
-          >
-            {/* Neural connection grid background */}
-            <div className="neural-connection-grid"></div>
-            
-            {/* Floating particles */}
-            <div className="floating-particles"></div>
-            
-
-            
-            {/* Main content */}
-            <div className="relative z-10 flex flex-col items-center justify-center">
-              <div className="relative mb-6">
-                <Zap 
-                  className="h-16 w-16 sm:h-20 sm:w-20 transition-all duration-500 group-hover:scale-110" 
-                  style={{ 
-                    color: "var(--askmira-primary)",
-                    filter: "drop-shadow(0 0 20px rgba(0, 212, 170, 0.4))"
-                  }} 
-                />
-                {/* Icon glow effect */}
-                <div className="absolute inset-0 h-16 w-16 sm:h-20 sm:w-20 bg-[var(--askmira-primary)] rounded-full opacity-20 blur-xl animate-pulse"></div>
-              </div>
-              
-              <div className="text-center space-y-2">
+        <div className="flex-1 px-4 sm:px-8">
+          {activeMode === "text" ? (
+            /* Chat Messages Area for Text Mode */
+            <div className="max-w-4xl mx-auto h-full flex flex-col">
+              <div className="flex-1 overflow-y-auto py-4 space-y-4">
+                {messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="relative mb-6">
+                        <Zap 
+                          className="h-12 w-12 mx-auto transition-all duration-500" 
+                          style={{ 
+                            color: "var(--askmira-primary)",
+                            filter: "drop-shadow(0 0 15px rgba(0, 212, 170, 0.3))"
+                          }} 
+                        />
+                      </div>
+                      <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
+                        color: "var(--askmira-text-muted)",
+                        letterSpacing: "1px"
+                      }}>START NEURAL CONVERSATION</p>
+                    </div>
+                  </div>
+                ) : (
+                  messages.map((message) => (
+                    <div 
+                      key={message.id} 
+                      className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div 
+                        className={`max-w-xs sm:max-w-md lg:max-w-lg px-4 py-3 rounded-lg font-mono text-sm ${
+                          message.isUser 
+                            ? 'bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white' 
+                            : 'bg-[rgba(26,26,26,0.6)] border border-[rgba(0,212,170,0.2)] text-[var(--askmira-text)]'
+                        }`}
+                        style={{
+                          backdropFilter: 'blur(10px)',
+                          boxShadow: message.isUser 
+                            ? '0 4px 15px rgba(0, 212, 170, 0.3)' 
+                            : '0 4px 15px rgba(0, 0, 0, 0.2)'
+                        }}
+                      >
+                        {message.text}
+                      </div>
+                    </div>
+                  ))
+                )}
                 
-                <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
-                  color: "var(--askmira-text-muted)",
-                  letterSpacing: "1px"
-                }}>INITIALIZE CONNECTION OR UPLOAD DATA PACKAGE</p>
+                {/* Loading indicator */}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="max-w-xs px-4 py-3 rounded-lg bg-[rgba(26,26,26,0.6)] border border-[rgba(0,212,170,0.2)]">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                        <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Scroll anchor */}
+                <div ref={messagesEndRef} />
               </div>
             </div>
-            
-            {/* Corner accent lines */}
-            <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
-            <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
-            <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
-            <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
-          </div>
+          ) : (
+            /* Upload Area for Other Modes */
+            <div className="flex items-center justify-center h-full">
+              <div 
+                className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group"
+                onClick={() => console.log("Upload area clicked")}
+              >
+                {/* Neural connection grid background */}
+                <div className="neural-connection-grid"></div>
+                
+                {/* Floating particles */}
+                <div className="floating-particles"></div>
+                
+                {/* Main content */}
+                <div className="relative z-10 flex flex-col items-center justify-center">
+                  <div className="relative mb-6">
+                    <Zap 
+                      className="h-16 w-16 sm:h-20 sm:w-20 transition-all duration-500 group-hover:scale-110" 
+                      style={{ 
+                        color: "var(--askmira-primary)",
+                        filter: "drop-shadow(0 0 20px rgba(0, 212, 170, 0.4))"
+                      }} 
+                    />
+                    {/* Icon glow effect */}
+                    <div className="absolute inset-0 h-16 w-16 sm:h-20 sm:w-20 bg-[var(--askmira-primary)] rounded-full opacity-20 blur-xl animate-pulse"></div>
+                  </div>
+                  
+                  <div className="text-center space-y-2">
+                    <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
+                      color: "var(--askmira-text-muted)",
+                      letterSpacing: "1px"
+                    }}>INITIALIZE CONNECTION OR UPLOAD DATA PACKAGE</p>
+                  </div>
+                </div>
+                
+                {/* Corner accent lines */}
+                <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input Area */}
@@ -358,6 +494,22 @@ export default function Home() {
                 <div className="status-dot"></div>
                 <div className="status-dot"></div>
               </div>
+              
+              <Button
+                onClick={handleSendMessage}
+                disabled={isLoading || !inputMessage.trim()}
+                className="askmira-send-btn absolute right-4 sm:right-5 top-1/2 transform -translate-y-1/2 p-2 sm:p-2.5 disabled:opacity-50"
+                style={{ 
+                  color: "var(--askmira-dark-400)" 
+                }}
+                data-testid="button-send"
+              >
+                {isLoading ? (
+                  <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                )}
+              </Button>
               
               {/* Enhanced corner indicators */}
               <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
