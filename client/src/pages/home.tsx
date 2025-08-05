@@ -614,31 +614,63 @@ export default function Home() {
               {/* Mira Video - Only visible when playing reply */}
               {isPlayingReply && (
                 <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-                  <video 
-                    ref={videoRef}
-                    src={miraVideo}
-                    loop
-                    muted
-                    autoPlay
-                    playsInline
-                    className="w-full h-full object-cover"
-                    style={{ 
-                      filter: 'drop-shadow(0 0 30px rgba(0, 212, 170, 0.5))',
-                      mixBlendMode: 'normal',
-                      transform: 'scale(1.2)'
-                    }}
-                    onLoadedData={() => {
-                      console.log("Video loaded, playing:", isPlayingReply);
-                      if (videoRef.current && isPlayingReply) {
-                        videoRef.current.play().catch(e => console.error("Video play error:", e));
-                      }
-                    }}
-                  />
+                  {/* Video container with futuristic frame */}
+                  <div className="relative">
+                    {/* Outer glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[var(--askmira-primary)] to-cyan-400 rounded-lg opacity-20 blur-xl animate-pulse"></div>
+                    
+                    {/* Neural frame border */}
+                    <div className="relative rounded-lg overflow-hidden border-2 border-[var(--askmira-primary)] shadow-2xl" 
+                         style={{ 
+                           background: 'linear-gradient(145deg, rgba(0,212,170,0.1), rgba(0,255,255,0.05))',
+                           backdropFilter: 'blur(20px)',
+                           boxShadow: '0 0 50px rgba(0, 212, 170, 0.4), inset 0 0 20px rgba(0, 212, 170, 0.1)'
+                         }}>
+                      
+                      {/* Corner indicators */}
+                      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] z-10"></div>
+                      <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[var(--askmira-primary)] z-10"></div>
+                      <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-[var(--askmira-primary)] z-10"></div>
+                      <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-[var(--askmira-primary)] z-10"></div>
+                      
+                      {/* Status indicator */}
+                      <div className="absolute top-3 left-1/2 transform -translate-x-1/2 z-10">
+                        <div className="flex items-center space-x-2 bg-black/50 px-3 py-1 rounded-full">
+                          <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
+                          <span className="text-xs font-mono text-[var(--askmira-primary)]">MIRA ACTIVE</span>
+                        </div>
+                      </div>
+                      
+                      <video 
+                        ref={videoRef}
+                        src={miraVideo}
+                        loop
+                        muted
+                        autoPlay
+                        playsInline
+                        className="w-80 h-96 object-cover"
+                        style={{ 
+                          filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
+                        }}
+                        onLoadedData={() => {
+                          console.log("Video loaded, playing:", isPlayingReply);
+                          if (videoRef.current && isPlayingReply) {
+                            videoRef.current.play().catch(e => console.error("Video play error:", e));
+                          }
+                        }}
+                      />
+                      
+                      {/* Scanning line effect */}
+                      <div className="absolute inset-0 overflow-hidden">
+                        <div className="scan-line"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
               
               {/* Voice Recording Controls */}
-              <div className={`askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group ${isPlayingReply ? 'z-10 opacity-20' : 'z-10'} transition-opacity duration-500`}>
+              <div className={`askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group ${isPlayingReply ? 'z-10 opacity-10 blur-sm' : 'z-10'} transition-all duration-700`}>
                 {/* Neural connection grid background */}
                 <div className="neural-connection-grid"></div>
                 
