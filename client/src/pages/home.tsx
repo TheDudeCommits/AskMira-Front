@@ -705,16 +705,25 @@ export default function Home() {
                       <div className="absolute inset-0 overflow-hidden">
                         <div className="scan-line"></div>
                       </div>
-                      
-                      {/* Subtitle display */}
-                      {currentSubtitle && (
-                        <div className="absolute bottom-4 left-4 right-4 bg-black/80 rounded-lg px-4 py-2 backdrop-blur-sm">
-                          <p className="text-[var(--askmira-primary)] text-sm font-mono text-center leading-relaxed">
+                    </div>
+                    
+                    {/* Subtitle display - Below the frame */}
+                    {currentSubtitle && (
+                      <div className="mt-6 max-w-2xl mx-auto">
+                        <div className="bg-gradient-to-r from-black/80 via-black/90 to-black/80 rounded-lg px-6 py-4 backdrop-blur-sm border border-[var(--askmira-primary)]/30"
+                             style={{
+                               boxShadow: '0 4px 20px rgba(0, 212, 170, 0.2), inset 0 1px 0 rgba(0, 212, 170, 0.1)'
+                             }}>
+                          <div className="flex items-center space-x-3 mb-2">
+                            <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
+                            <span className="text-xs font-mono text-[var(--askmira-primary)] opacity-70 tracking-wider">MIRA_TRANSMISSION</span>
+                          </div>
+                          <p className="text-[var(--askmira-primary)] text-base font-mono text-center leading-relaxed tracking-wide">
                             {currentSubtitle}
                           </p>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
