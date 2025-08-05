@@ -620,12 +620,7 @@ export default function Home() {
         
         {/* Content overlay */}
         <div className="relative z-10 flex flex-col h-full">
-        {/* Header */}
-        <div className="flex items-center justify-center py-6 px-4">
-          <h1 className="text-2xl md:text-4xl font-bold text-center" style={{ color: "var(--askmira-primary)" }}>
-            AskMira
-          </h1>
-        </div>
+        
 
         {/* Toggle Buttons */}
         <div className="flex items-center justify-center gap-1 sm:gap-2 lg:gap-4 mb-6 md:mb-8 px-2 overflow-x-auto scrollbar-hide">
