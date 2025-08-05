@@ -219,19 +219,28 @@ export default function Home() {
       setIsPlayingReply(true);
       setCurrentSubtitle("Mira is speaking...");
       
-      if (audioRef.current && videoRef.current) {
+      if (audioRef.current) {
         audioRef.current.src = audioUrl;
-        
-        // Start video immediately when reply state is set
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().then(() => {
-          console.log("Video started playing");
-        }).catch(e => console.error("Video play error:", e));
+        audioRef.current.load();
         
         // Start audio playback
         audioRef.current.play().then(() => {
           console.log("Audio started playing");
-        }).catch(e => console.error("Audio play error:", e));
+          // Start video when audio successfully starts
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play().then(() => {
+              console.log("Video started playing");
+            }).catch(e => console.error("Video play error:", e));
+          }
+        }).catch(e => {
+          console.error("Audio play error:", e);
+          // Try to start video anyway
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play().catch(ve => console.error("Video play error:", ve));
+          }
+        });
       }
       
       // Clear audio chunks for next recording
