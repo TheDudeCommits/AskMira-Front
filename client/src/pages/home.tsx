@@ -18,6 +18,7 @@ import {
   PanelLeftOpen
 } from "lucide-react";
 import backgroundVideo from "@assets/Header Minimal (1)_1754338987422.mp4";
+import miraVideo from "@assets/Mira Vertical No Background 2_1754353314687.mp4";
 
 type Mode = "text" | "voice" | "mira" | "detector";
 
@@ -52,6 +53,14 @@ export default function Home() {
   const [messages, setMessages] = useState<Array<{id: string, text: string, isUser: boolean, timestamp: Date}>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Voice recording states
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [isPlayingReply, setIsPlayingReply] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const modes = [
     { id: "text" as Mode, label: "TEXT", icon: MessageSquare },
@@ -108,6 +117,91 @@ export default function Home() {
       return "❌ Network error: Unable to reach Mira backend.";
     }
   }
+
+  // Voice recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          setAudioChunks(prev => [...prev, event.data]);
+        }
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setAudioChunks([]);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      alert("Could not access microphone. Please check permissions.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
+    }
+  };
+
+  const sendVoiceMessage = async () => {
+    if (audioChunks.length === 0) return;
+
+    setIsLoading(true);
+    
+    try {
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+
+      const response = await fetch("https://AskMira-Backend-Voice.replit.app/api/voice", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Get the audio response as blob
+      const audioResponseBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioResponseBlob);
+      
+      // Play the audio response
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+        setIsPlayingReply(true);
+        
+        // Start the Mira video when audio plays
+        if (videoRef.current) {
+          videoRef.current.play();
+        }
+      }
+      
+      // Clear audio chunks for next recording
+      setAudioChunks([]);
+      
+    } catch (error) {
+      console.error("Error sending voice message:", error);
+      alert("Sorry, I'm having trouble processing your voice message. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle audio playback events
+  const handleAudioEnded = () => {
+    setIsPlayingReply(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
 
   const handleSendMessage = async () => {
     if (inputMessage.trim() && activeMode === "text" && !isLoading) {
@@ -461,6 +555,121 @@ export default function Home() {
                 <div ref={messagesEndRef} />
               </div>
             </div>
+          ) : activeMode === "voice" ? (
+            /* Voice Recording Interface */
+            <div className="flex items-center justify-center h-full relative">
+              {/* Mira Video - Only visible when playing reply */}
+              {isPlayingReply && (
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                  <video 
+                    ref={videoRef}
+                    src={miraVideo}
+                    loop
+                    muted
+                    className="max-h-full max-w-full object-contain"
+                    style={{ filter: 'drop-shadow(0 0 30px rgba(0, 212, 170, 0.5))' }}
+                  />
+                </div>
+              )}
+              
+              {/* Voice Recording Controls */}
+              <div className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group z-10">
+                {/* Neural connection grid background */}
+                <div className="neural-connection-grid"></div>
+                
+                {/* Floating particles */}
+                <div className="floating-particles"></div>
+                
+                {/* Main content */}
+                <div className="relative z-10 flex flex-col items-center justify-center space-y-6">
+                  <div className="relative mb-6">
+                    <Mic 
+                      className={`h-16 w-16 sm:h-20 sm:w-20 transition-all duration-500 group-hover:scale-110 ${
+                        isRecording ? 'animate-pulse' : ''
+                      }`}
+                      style={{ 
+                        color: isRecording ? "#ff4444" : "var(--askmira-primary)",
+                        filter: `drop-shadow(0 0 20px ${isRecording ? 'rgba(255, 68, 68, 0.4)' : 'rgba(0, 212, 170, 0.4)'})`
+                      }} 
+                    />
+                    {/* Icon glow effect */}
+                    <div className={`absolute inset-0 h-16 w-16 sm:h-20 sm:w-20 rounded-full opacity-20 blur-xl animate-pulse ${
+                      isRecording ? 'bg-red-500' : 'bg-[var(--askmira-primary)]'
+                    }`}></div>
+                  </div>
+                  
+                  {/* Recording Controls */}
+                  <div className="flex space-x-4">
+                    {!isRecording ? (
+                      <Button
+                        onClick={startRecording}
+                        disabled={isLoading}
+                        className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-6 py-3 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300"
+                        style={{
+                          boxShadow: '0 4px 15px rgba(0, 212, 170, 0.3)',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        data-testid="button-start-recording"
+                      >
+                        START RECORDING
+                      </Button>
+                    ) : (
+                      <div className="flex space-x-3">
+                        <Button
+                          onClick={stopRecording}
+                          className="bg-gradient-to-r from-red-500 to-red-600 text-white font-mono text-sm px-6 py-3 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300"
+                          style={{
+                            boxShadow: '0 4px 15px rgba(255, 68, 68, 0.3)',
+                            backdropFilter: 'blur(10px)'
+                          }}
+                          data-testid="button-stop-recording"
+                        >
+                          STOP RECORDING
+                        </Button>
+                        
+                        <Button
+                          onClick={sendVoiceMessage}
+                          disabled={audioChunks.length === 0 || isLoading}
+                          className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-6 py-3 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300 disabled:opacity-50"
+                          style={{
+                            boxShadow: '0 4px 15px rgba(0, 212, 170, 0.3)',
+                            backdropFilter: 'blur(10px)'
+                          }}
+                          data-testid="button-send-voice"
+                        >
+                          SEND
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="text-center space-y-2">
+                    <p className="text-xs sm:text-sm font-mono tracking-wider opacity-60" style={{ 
+                      color: "var(--askmira-text-muted)",
+                      letterSpacing: "1px"
+                    }}>
+                      {isRecording ? "RECORDING IN PROGRESS..." : 
+                       isLoading ? "PROCESSING VOICE MESSAGE..." :
+                       isPlayingReply ? "MIRA IS SPEAKING..." :
+                       "CLICK TO START VOICE RECORDING"}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Corner accent lines */}
+                <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+              </div>
+              
+              {/* Hidden audio element for playback */}
+              <audio 
+                ref={audioRef} 
+                onEnded={handleAudioEnded}
+                style={{ display: 'none' }}
+              />
+            </div>
           ) : (
             /* Upload Area for Other Modes */
             <div className="flex items-center justify-center h-full">
@@ -506,63 +715,66 @@ export default function Home() {
           )}
         </div>
 
-        {/* Input Area */}
-        <div className="p-4 sm:p-6">
-          <div className="max-w-4xl mx-auto relative">
-            {/* Status Bar */}
-            <div className="flex items-center justify-between mb-3 px-2">
-              <div className="flex items-center space-x-3">
-              </div>
-              <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50">
-                [SECURE_CHANNEL]
-              </div>
-            </div>
-
-            {/* Input Container */}
-            <div className="futuristic-input-container rounded-xl">
-              <div className="neural-grid"></div>
-              
-              {/* Data stream indicator */}
-              <div className="data-stream">
-                &gt;&gt; DATA_STREAM_ACTIVE
+        {/* Input Area - Only show for text mode */}
+        {activeMode === "text" && (
+          <div className="p-4 sm:p-6">
+            <div className="max-w-4xl mx-auto relative">
+              {/* Status Bar */}
+              <div className="flex items-center justify-between mb-3 px-2">
+                <div className="flex items-center space-x-3">
+                </div>
+                <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50">
+                  [SECURE_CHANNEL]
+                </div>
               </div>
 
-              <Input
-                type="text"
-                placeholder="Enter neural transmission"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="askmira-input w-full pl-6 sm:pl-8 pr-12 sm:pr-14 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide border-0 bg-transparent"
-                style={{ 
-                  letterSpacing: '0.5px',
-                  textShadow: '0 0 15px rgba(0, 212, 170, 0.4)'
-                }}
-              />
-              
-              <div className="status-dots">
-                <div className="status-dot"></div>
-                <div className="status-dot"></div>
-                <div className="status-dot"></div>
-              </div>
-              
-              {/* Enhanced corner indicators */}
-              <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
-              <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
-              <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
-              <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
-            </div>
+              {/* Input Container */}
+              <div className="futuristic-input-container rounded-xl">
+                <div className="neural-grid"></div>
+                
+                {/* Data stream indicator */}
+                <div className="data-stream">
+                  &gt;&gt; DATA_STREAM_ACTIVE
+                </div>
 
-            {/* Connection Status Footer */}
-            <div className="flex items-center justify-center mt-3 space-x-4 text-xs font-mono text-[var(--askmira-text-muted)] opacity-40">
-              <span>LATENCY: {latency}ms</span>
-              <span>•</span>
-              <span>ENCRYPTION: AES-256</span>
-              <span>•</span>
-              <span>BANDWIDTH: ∞</span>
+                <Input
+                  type="text"
+                  placeholder="Enter neural transmission"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="askmira-input w-full pl-6 sm:pl-8 pr-12 sm:pr-14 py-4 sm:py-5 rounded-lg text-sm sm:text-lg placeholder:text-[var(--askmira-text-muted)] font-mono tracking-wide border-0 bg-transparent"
+                  style={{ 
+                    letterSpacing: '0.5px',
+                    textShadow: '0 0 15px rgba(0, 212, 170, 0.4)'
+                  }}
+                  data-testid="input-neural-transmission"
+                />
+                
+                <div className="status-dots">
+                  <div className="status-dot"></div>
+                  <div className="status-dot"></div>
+                  <div className="status-dot"></div>
+                </div>
+                
+                {/* Enhanced corner indicators */}
+                <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+                <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+                <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+                <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-40 transition-all duration-300 group-hover:opacity-80"></div>
+              </div>
+
+              {/* Connection Status Footer */}
+              <div className="flex items-center justify-center mt-3 space-x-4 text-xs font-mono text-[var(--askmira-text-muted)] opacity-40">
+                <span>LATENCY: {latency}ms</span>
+                <span>•</span>
+                <span>ENCRYPTION: AES-256</span>
+                <span>•</span>
+                <span>BANDWIDTH: ∞</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         </div>
       </div>
     </div>
