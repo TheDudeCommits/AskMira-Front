@@ -263,7 +263,7 @@ export default function Home() {
                   console.log("Video started playing");
                 }).catch(e => console.error("Video play error:", e));
               }
-            }).catch(e => {
+            }).catch((e: unknown) => {
               console.error("Audio play error:", e);
               // Try to start video anyway
               if (videoRef.current) {
@@ -820,8 +820,8 @@ export default function Home() {
             /* Upload Area for Other Modes */
             <div className="flex items-center justify-center h-full">
               <div 
-                className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group"
-                onClick={() => console.log("Upload area clicked")}
+                className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group blur-sm opacity-60 pointer-events-none"
+                style={{ filter: 'blur(2px)' }}
               >
                 {/* Neural connection grid background */}
                 <div className="neural-connection-grid"></div>
@@ -833,7 +833,7 @@ export default function Home() {
                 <div className="relative z-10 flex flex-col items-center justify-center">
                   <div className="relative mb-6">
                     <Zap 
-                      className="h-16 w-16 sm:h-20 sm:w-20 transition-all duration-500 group-hover:scale-110" 
+                      className="h-16 w-16 sm:h-20 sm:w-20 transition-all duration-500" 
                       style={{ 
                         color: "var(--askmira-primary)",
                         filter: "drop-shadow(0 0 20px rgba(0, 212, 170, 0.4))"
@@ -848,6 +848,25 @@ export default function Home() {
                       color: "var(--askmira-text-muted)",
                       letterSpacing: "1px"
                     }}>INITIALIZE CONNECTION OR UPLOAD DATA PACKAGE</p>
+                  </div>
+                </div>
+                
+                {/* Coming Soon Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40 backdrop-blur-sm rounded-lg">
+                  <div className="text-center">
+                    <div className="bg-gradient-to-r from-black/90 via-black/95 to-black/90 rounded-lg px-8 py-6 border border-[var(--askmira-primary)]/30"
+                         style={{
+                           boxShadow: '0 8px 32px rgba(0, 212, 170, 0.2), inset 0 1px 0 rgba(0, 212, 170, 0.1)'
+                         }}>
+                      <div className="flex items-center justify-center space-x-3 mb-3">
+                        <div className="w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
+                        <span className="text-sm font-mono text-orange-400 tracking-wider">DEVELOPMENT</span>
+                      </div>
+                      <h3 className="text-2xl font-mono text-[var(--askmira-primary)] mb-2 tracking-wider">COMING SOON</h3>
+                      <p className="text-sm font-mono text-[var(--askmira-text-muted)] opacity-70 tracking-wide">
+                        MIRA MODE UNDER CONSTRUCTION
+                      </p>
+                    </div>
                   </div>
                 </div>
                 
