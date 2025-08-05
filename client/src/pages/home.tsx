@@ -209,38 +209,70 @@ export default function Home() {
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
-      // Get the audio response as blob
-      const audioResponseBlob = await response.blob();
-      console.log("Response audio blob:", audioResponseBlob.size, "bytes");
+      // Check if response is JSON (contains both audio and text) or just audio
+      const contentType = response.headers.get('content-type');
+      console.log("Response content type:", contentType);
+      
+      let audioResponseBlob;
+      let transcriptionText = "Mira is speaking...";
+      
+      if (contentType && contentType.includes('application/json')) {
+        // Response contains both audio and text
+        const jsonResponse = await response.json();
+        transcriptionText = jsonResponse.text || "Mira is speaking...";
+        
+        // Convert base64 audio to blob if present
+        if (jsonResponse.audio) {
+          const audioData = atob(jsonResponse.audio);
+          const audioArray = new Uint8Array(audioData.length);
+          for (let i = 0; i < audioData.length; i++) {
+            audioArray[i] = audioData.charCodeAt(i);
+          }
+          audioResponseBlob = new Blob([audioArray], { type: 'audio/mpeg' });
+        }
+      } else {
+        // Response is just audio blob
+        audioResponseBlob = await response.blob();
+      }
+      
+      console.log("Response audio blob:", audioResponseBlob?.size || 0, "bytes");
+      
+      if (!audioResponseBlob || audioResponseBlob.size === 0) {
+        throw new Error("No audio data received from API");
+      }
       
       const audioUrl = URL.createObjectURL(audioResponseBlob);
       
       // Play the audio response and start video immediately
       setIsPlayingReply(true);
-      setCurrentSubtitle("Mira is speaking...");
+      setCurrentSubtitle(transcriptionText);
       
-      if (audioRef.current) {
+      if (audioRef.current && audioResponseBlob) {
         audioRef.current.src = audioUrl;
         audioRef.current.load();
         
-        // Start audio playback
-        audioRef.current.play().then(() => {
-          console.log("Audio started playing");
-          // Start video when audio successfully starts
-          if (videoRef.current) {
-            videoRef.current.currentTime = 0;
-            videoRef.current.play().then(() => {
-              console.log("Video started playing");
-            }).catch(e => console.error("Video play error:", e));
+        // Add a small delay to ensure audio is ready
+        setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.play().then(() => {
+              console.log("Audio started playing");
+              // Start video when audio successfully starts
+              if (videoRef.current) {
+                videoRef.current.currentTime = 0;
+                videoRef.current.play().then(() => {
+                  console.log("Video started playing");
+                }).catch(e => console.error("Video play error:", e));
+              }
+            }).catch(e => {
+              console.error("Audio play error:", e);
+              // Try to start video anyway
+              if (videoRef.current) {
+                videoRef.current.currentTime = 0;
+                videoRef.current.play().catch(ve => console.error("Video play error:", ve));
+              }
+            });
           }
-        }).catch(e => {
-          console.error("Audio play error:", e);
-          // Try to start video anyway
-          if (videoRef.current) {
-            videoRef.current.currentTime = 0;
-            videoRef.current.play().catch(ve => console.error("Video play error:", ve));
-          }
-        });
+        }, 100);
       }
       
       // Clear audio chunks for next recording
