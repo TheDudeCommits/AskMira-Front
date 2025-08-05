@@ -59,6 +59,7 @@ export default function Home() {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
   const [isPlayingReply, setIsPlayingReply] = useState(false);
+  const [currentSubtitle, setCurrentSubtitle] = useState("");
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -214,21 +215,22 @@ export default function Home() {
       
       const audioUrl = URL.createObjectURL(audioResponseBlob);
       
-      // Play the audio response
-      if (audioRef.current) {
+      // Play the audio response and start video immediately
+      setIsPlayingReply(true);
+      setCurrentSubtitle("Mira is speaking...");
+      
+      if (audioRef.current && videoRef.current) {
         audioRef.current.src = audioUrl;
-        setIsPlayingReply(true);
+        
+        // Start video immediately when reply state is set
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().then(() => {
+          console.log("Video started playing");
+        }).catch(e => console.error("Video play error:", e));
         
         // Start audio playback
         audioRef.current.play().then(() => {
           console.log("Audio started playing");
-          // Start the Mira video when audio plays successfully
-          if (videoRef.current) {
-            videoRef.current.currentTime = 0;
-            videoRef.current.play().then(() => {
-              console.log("Video started playing");
-            }).catch(e => console.error("Video play error:", e));
-          }
         }).catch(e => console.error("Audio play error:", e));
       }
       
@@ -250,6 +252,7 @@ export default function Home() {
   // Handle audio playback events
   const handleAudioEnded = () => {
     setIsPlayingReply(false);
+    setCurrentSubtitle("");
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -648,10 +651,7 @@ export default function Home() {
                         muted
                         autoPlay
                         playsInline
-                        className="w-80 h-96 object-cover"
-                        style={{ 
-                          filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
-                        }}
+                        className="w-80 h-[500px] object-cover"
                         onLoadedData={() => {
                           console.log("Video loaded, playing:", isPlayingReply);
                           if (videoRef.current && isPlayingReply) {
@@ -664,6 +664,15 @@ export default function Home() {
                       <div className="absolute inset-0 overflow-hidden">
                         <div className="scan-line"></div>
                       </div>
+                      
+                      {/* Subtitle display */}
+                      {currentSubtitle && (
+                        <div className="absolute bottom-4 left-4 right-4 bg-black/80 rounded-lg px-4 py-2 backdrop-blur-sm">
+                          <p className="text-[var(--askmira-primary)] text-sm font-mono text-center leading-relaxed">
+                            {currentSubtitle}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
