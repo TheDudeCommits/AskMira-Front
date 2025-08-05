@@ -121,54 +121,93 @@ export default function Home() {
   // Voice recording functions
   const startRecording = async () => {
     try {
+      console.log("Starting recording...");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      
+      // Try different mime types based on browser support
+      let options = {};
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        options = { mimeType: 'audio/webm;codecs=opus' };
+      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+        options = { mimeType: 'audio/webm' };
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        options = { mimeType: 'audio/mp4' };
+      }
+      
+      const recorder = new MediaRecorder(stream, options);
+      const chunks: Blob[] = [];
       
       recorder.ondataavailable = (event) => {
+        console.log("Data available:", event.data.size);
         if (event.data.size > 0) {
-          setAudioChunks(prev => [...prev, event.data]);
+          chunks.push(event.data);
         }
       };
 
-      recorder.start();
+      recorder.onstop = () => {
+        console.log("Recording stopped, chunks:", chunks.length);
+        setAudioChunks(chunks);
+      };
+
+      recorder.start(1000); // Collect data every second
       setMediaRecorder(recorder);
       setIsRecording(true);
       setAudioChunks([]);
+      console.log("Recording started successfully");
     } catch (error) {
       console.error("Error starting recording:", error);
-      alert("Could not access microphone. Please check permissions.");
+      alert("Could not access microphone. Please check permissions and try again.");
     }
   };
 
   const stopRecording = () => {
+    console.log("Stopping recording...");
     if (mediaRecorder && isRecording) {
       mediaRecorder.stop();
       mediaRecorder.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
+      console.log("Recording stopped");
     }
   };
 
   const sendVoiceMessage = async () => {
-    if (audioChunks.length === 0) return;
+    console.log("Sending voice message, chunks:", audioChunks.length);
+    if (audioChunks.length === 0) {
+      alert("No audio recorded. Please record some audio first.");
+      return;
+    }
 
     setIsLoading(true);
     
     try {
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      // Create blob from chunks
+      const audioBlob = new Blob(audioChunks, { 
+        type: audioChunks[0]?.type || 'audio/webm' 
+      });
+      
+      console.log("Audio blob created:", audioBlob.size, "bytes, type:", audioBlob.type);
+      
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
 
+      console.log("Sending to API...");
       const response = await fetch("https://AskMira-Backend-Voice.replit.app/api/voice", {
         method: "POST",
         body: formData
       });
 
+      console.log("API response status:", response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error("API error:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       // Get the audio response as blob
       const audioResponseBlob = await response.blob();
+      console.log("Response audio blob:", audioResponseBlob.size, "bytes");
+      
       const audioUrl = URL.createObjectURL(audioResponseBlob);
       
       // Play the audio response
@@ -188,7 +227,7 @@ export default function Home() {
       
     } catch (error) {
       console.error("Error sending voice message:", error);
-      alert("Sorry, I'm having trouble processing your voice message. Please try again.");
+      alert(`Error processing voice message: ${error.message}. Please try again.`);
     } finally {
       setIsLoading(false);
     }
@@ -599,8 +638,8 @@ export default function Home() {
                   </div>
                   
                   {/* Recording Controls */}
-                  <div className="flex space-x-4">
-                    {!isRecording ? (
+                  <div className="flex flex-col items-center space-y-4">
+                    {!isRecording && audioChunks.length === 0 ? (
                       <Button
                         onClick={startRecording}
                         disabled={isLoading}
@@ -613,31 +652,46 @@ export default function Home() {
                       >
                         START RECORDING
                       </Button>
+                    ) : isRecording ? (
+                      <Button
+                        onClick={stopRecording}
+                        className="bg-gradient-to-r from-red-500 to-red-600 text-white font-mono text-sm px-8 py-4 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 animate-pulse"
+                        style={{
+                          boxShadow: '0 4px 15px rgba(255, 68, 68, 0.3)',
+                          backdropFilter: 'blur(10px)'
+                        }}
+                        data-testid="button-stop-recording"
+                      >
+                        STOP RECORDING
+                      </Button>
                     ) : (
                       <div className="flex space-x-3">
                         <Button
-                          onClick={stopRecording}
-                          className="bg-gradient-to-r from-red-500 to-red-600 text-white font-mono text-sm px-6 py-3 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300"
+                          onClick={() => {
+                            setAudioChunks([]);
+                            console.log("Recording cleared");
+                          }}
+                          className="bg-gradient-to-r from-gray-600 to-gray-700 text-white font-mono text-sm px-4 py-3 rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300"
                           style={{
-                            boxShadow: '0 4px 15px rgba(255, 68, 68, 0.3)',
+                            boxShadow: '0 4px 15px rgba(100, 100, 100, 0.3)',
                             backdropFilter: 'blur(10px)'
                           }}
-                          data-testid="button-stop-recording"
+                          data-testid="button-clear-recording"
                         >
-                          STOP RECORDING
+                          CLEAR
                         </Button>
                         
                         <Button
                           onClick={sendVoiceMessage}
-                          disabled={audioChunks.length === 0 || isLoading}
-                          className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-6 py-3 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300 disabled:opacity-50"
+                          disabled={isLoading}
+                          className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-8 py-4 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300"
                           style={{
                             boxShadow: '0 4px 15px rgba(0, 212, 170, 0.3)',
                             backdropFilter: 'blur(10px)'
                           }}
                           data-testid="button-send-voice"
                         >
-                          SEND
+                          {isLoading ? "SENDING..." : "SEND VOICE"}
                         </Button>
                       </div>
                     )}
