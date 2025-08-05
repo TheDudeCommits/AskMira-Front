@@ -147,6 +147,10 @@ export default function Home() {
       recorder.onstop = () => {
         console.log("Recording stopped, chunks:", chunks.length);
         setAudioChunks(chunks);
+        // Auto-send voice message when recording stops
+        setTimeout(() => {
+          sendVoiceMessageWithChunks(chunks);
+        }, 100);
       };
 
       recorder.start(1000); // Collect data every second
@@ -170,10 +174,10 @@ export default function Home() {
     }
   };
 
-  const sendVoiceMessage = async () => {
-    console.log("Sending voice message, chunks:", audioChunks.length);
-    if (audioChunks.length === 0) {
-      alert("No audio recorded. Please record some audio first.");
+  const sendVoiceMessageWithChunks = async (chunks: Blob[]) => {
+    console.log("Sending voice message, chunks:", chunks.length);
+    if (chunks.length === 0) {
+      console.error("No audio chunks to send");
       return;
     }
 
@@ -181,8 +185,8 @@ export default function Home() {
     
     try {
       // Create blob from chunks
-      const audioBlob = new Blob(audioChunks, { 
-        type: audioChunks[0]?.type || 'audio/webm' 
+      const audioBlob = new Blob(chunks, { 
+        type: chunks[0]?.type || 'audio/webm' 
       });
       
       console.log("Audio blob created:", audioBlob.size, "bytes, type:", audioBlob.type);
@@ -231,6 +235,10 @@ export default function Home() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const sendVoiceMessage = async () => {
+    return sendVoiceMessageWithChunks(audioChunks);
   };
 
   // Handle audio playback events
@@ -639,11 +647,11 @@ export default function Home() {
                   
                   {/* Recording Controls */}
                   <div className="flex flex-col items-center space-y-4">
-                    {!isRecording && audioChunks.length === 0 ? (
+                    {!isRecording && !isLoading ? (
                       <Button
                         onClick={startRecording}
                         disabled={isLoading}
-                        className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-6 py-3 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300"
+                        className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-8 py-4 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300"
                         style={{
                           boxShadow: '0 4px 15px rgba(0, 212, 170, 0.3)',
                           backdropFilter: 'blur(10px)'
@@ -662,39 +670,14 @@ export default function Home() {
                         }}
                         data-testid="button-stop-recording"
                       >
-                        STOP RECORDING
+                        STOP & SEND
                       </Button>
-                    ) : (
-                      <div className="flex space-x-3">
-                        <Button
-                          onClick={() => {
-                            setAudioChunks([]);
-                            console.log("Recording cleared");
-                          }}
-                          className="bg-gradient-to-r from-gray-600 to-gray-700 text-white font-mono text-sm px-4 py-3 rounded-lg hover:from-gray-700 hover:to-gray-800 transition-all duration-300"
-                          style={{
-                            boxShadow: '0 4px 15px rgba(100, 100, 100, 0.3)',
-                            backdropFilter: 'blur(10px)'
-                          }}
-                          data-testid="button-clear-recording"
-                        >
-                          CLEAR
-                        </Button>
-                        
-                        <Button
-                          onClick={sendVoiceMessage}
-                          disabled={isLoading}
-                          className="bg-gradient-to-r from-[var(--askmira-primary)] to-[rgba(0,212,170,0.8)] text-white font-mono text-sm px-8 py-4 rounded-lg hover:from-[rgba(0,212,170,0.9)] hover:to-[var(--askmira-primary)] transition-all duration-300"
-                          style={{
-                            boxShadow: '0 4px 15px rgba(0, 212, 170, 0.3)',
-                            backdropFilter: 'blur(10px)'
-                          }}
-                          data-testid="button-send-voice"
-                        >
-                          {isLoading ? "SENDING..." : "SEND VOICE"}
-                        </Button>
+                    ) : isLoading ? (
+                      <div className="flex items-center space-x-3">
+                        <div className="w-6 h-6 border-2 border-[var(--askmira-primary)] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-[var(--askmira-primary)] font-mono text-sm">PROCESSING...</span>
                       </div>
-                    )}
+                    ) : null}
                   </div>
                   
                   <div className="text-center space-y-2">
@@ -702,10 +685,10 @@ export default function Home() {
                       color: "var(--askmira-text-muted)",
                       letterSpacing: "1px"
                     }}>
-                      {isRecording ? "RECORDING IN PROGRESS..." : 
-                       isLoading ? "PROCESSING VOICE MESSAGE..." :
+                      {isRecording ? "RECORDING... CLICK STOP TO SEND" : 
+                       isLoading ? "SENDING TO MIRA..." :
                        isPlayingReply ? "MIRA IS SPEAKING..." :
-                       "CLICK TO START VOICE RECORDING"}
+                       "READY FOR VOICE RECORDING"}
                     </p>
                   </div>
                 </div>
