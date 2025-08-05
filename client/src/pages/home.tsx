@@ -668,10 +668,10 @@ export default function Home() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 px-4 sm:px-8 overflow-hidden">
+        <div className="flex-1 overflow-hidden">
           {activeMode === "text" ? (
             /* Chat Messages Area for Text Mode */
-            <div className="max-w-4xl mx-auto h-full flex flex-col">
+            <div className="max-w-4xl mx-auto h-full flex flex-col px-4 sm:px-8">
               <div className="flex-1 overflow-y-auto py-4 space-y-4 max-h-[calc(100vh-280px)] chat-scroll">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full">
@@ -929,8 +929,8 @@ export default function Home() {
             </div>
           ) : activeMode === "detector" ? (
             /* AI Detector Interface */
-            <div className="flex items-center justify-center min-h-full px-4 sm:px-6 lg:px-8 py-8">
-              <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6">
+            <div className="flex items-center justify-center min-h-full py-8">
+              <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-6 lg:px-8">
                 {/* Input Section */}
                 <div className="askmira-upload-area relative group">
                   {/* Neural connection grid background */}
@@ -1149,7 +1149,7 @@ export default function Home() {
             </div>
           ) : (
             /* Upload Area for Other Modes (MIRA) */
-            <div className="flex items-center justify-center h-full">
+            <div className="flex items-center justify-center h-full px-4 sm:px-6 lg:px-8">
               <div 
                 className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group blur-sm opacity-60 pointer-events-none"
                 style={{ filter: 'blur(2px)' }}
@@ -1213,7 +1213,7 @@ export default function Home() {
 
         {/* Input Area - Only show for text mode */}
         {activeMode === "text" && (
-          <div className="p-4 sm:p-6">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
             <div className="max-w-4xl mx-auto relative">
               {/* Status Bar */}
               <div className="flex items-center justify-between mb-3 px-2">
