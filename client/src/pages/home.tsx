@@ -63,6 +63,13 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // AI Detector states
+  const [detectorText, setDetectorText] = useState("");
+  const [detectorFile, setDetectorFile] = useState<File | null>(null);
+  const [detectorResult, setDetectorResult] = useState<{probability: number, label: string} | null>(null);
+  const [isDetecting, setIsDetecting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const modes = [
     { id: "text" as Mode, label: "TEXT", icon: MessageSquare },
     { id: "voice" as Mode, label: "VOICE", icon: Mic },
@@ -115,7 +122,55 @@ export default function Home() {
         return "❌ Unknown error occurred.";
       }
     } catch (error) {
+      console.error("Mira API error:", error);
       return "❌ Network error: Unable to reach Mira backend.";
+    }
+  }
+
+  // API function for AI detection
+  async function detectAIContent(text?: string, file?: File): Promise<{probability: number, label: string}> {
+    try {
+      let response;
+      
+      if (file) {
+        // Send file as FormData
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        response = await fetch("https://AskMira-Backend-TextDetect.replit.app/api/detect", {
+          method: "POST",
+          body: formData
+        });
+      } else if (text) {
+        // Send text as JSON
+        response = await fetch("https://AskMira-Backend-TextDetect.replit.app/api/detect", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text })
+        });
+      } else {
+        throw new Error("No text or file provided");
+      }
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (typeof data.probability === 'number' && data.label) {
+        return {
+          probability: data.probability,
+          label: data.label
+        };
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("AI detection error:", error);
+      throw error;
     }
   }
 
@@ -347,6 +402,62 @@ export default function Home() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  // AI Detector handlers
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      setDetectorFile(file);
+      setDetectorText(""); // Clear text when file is selected
+      setDetectorResult(null); // Clear previous result
+    } else if (file) {
+      alert("Please select a .docx file");
+      e.target.value = "";
+    }
+  };
+
+  const handleDetectorTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDetectorText(e.target.value);
+    if (e.target.value.trim()) {
+      setDetectorFile(null); // Clear file when text is entered
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+    setDetectorResult(null); // Clear previous result
+  };
+
+  const handleDetectorSubmit = async () => {
+    if (!detectorText.trim() && !detectorFile) {
+      alert("Please enter text or upload a .docx file");
+      return;
+    }
+
+    setIsDetecting(true);
+    setDetectorResult(null);
+
+    try {
+      const result = await detectAIContent(
+        detectorText.trim() || undefined,
+        detectorFile || undefined
+      );
+      setDetectorResult(result);
+    } catch (error) {
+      console.error("Detection error:", error);
+      alert("Error analyzing content. Please try again.");
+    } finally {
+      setIsDetecting(false);
+    }
+  };
+
+  const clearDetectorInput = () => {
+    setDetectorText("");
+    setDetectorFile(null);
+    setDetectorResult(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -816,8 +927,228 @@ export default function Home() {
                 style={{ display: 'none' }}
               />
             </div>
+          ) : activeMode === "detector" ? (
+            /* AI Detector Interface */
+            <div className="flex items-center justify-center h-full">
+              <div className="w-full max-w-4xl mx-auto space-y-6">
+                {/* Input Section */}
+                <div className="askmira-upload-area relative group">
+                  {/* Neural connection grid background */}
+                  <div className="neural-connection-grid"></div>
+                  
+                  {/* Floating particles */}
+                  <div className="floating-particles"></div>
+                  
+                  <div className="relative z-10 p-6 space-y-6">
+                    <div className="text-center space-y-2 mb-6">
+                      <div className="flex items-center justify-center space-x-3 mb-3">
+                        <Shield 
+                          className="h-8 w-8 transition-all duration-500" 
+                          style={{ 
+                            color: "var(--askmira-primary)",
+                            filter: "drop-shadow(0 0 20px rgba(0, 212, 170, 0.4))"
+                          }} 
+                        />
+                        <h2 className="text-xl font-mono" style={{ color: "var(--askmira-primary)" }}>
+                          AI CONTENT DETECTOR
+                        </h2>
+                      </div>
+                      <p className="text-xs font-mono tracking-wider opacity-60" style={{ 
+                        color: "var(--askmira-text-muted)",
+                        letterSpacing: "1px"
+                      }}>
+                        ANALYZE TEXT OR UPLOAD .DOCX FILE
+                      </p>
+                    </div>
+
+                    {/* Text Input */}
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <textarea
+                          value={detectorText}
+                          onChange={handleDetectorTextChange}
+                          placeholder="Paste your text here to analyze..."
+                          className="w-full h-40 px-4 py-3 rounded-lg bg-[rgba(26,26,26,0.6)] border border-[rgba(0,212,170,0.2)] text-[var(--askmira-text)] placeholder:text-[var(--askmira-text-muted)] font-mono text-sm resize-none"
+                          style={{
+                            backdropFilter: 'blur(10px)',
+                            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+                            lineHeight: '1.6'
+                          }}
+                          data-testid="textarea-detector-text"
+                        />
+                      </div>
+
+                      {/* OR Divider */}
+                      <div className="flex items-center space-x-4">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--askmira-primary)] to-transparent opacity-30"></div>
+                        <span className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50">OR</span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--askmira-primary)] to-transparent opacity-30"></div>
+                      </div>
+
+                      {/* File Upload */}
+                      <div className="space-y-2">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept=".docx"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          data-testid="input-file-upload"
+                        />
+                        <Button
+                          onClick={() => fileInputRef.current?.click()}
+                          className="w-full py-3 px-4 rounded-lg border-2 border-dashed border-[rgba(0,212,170,0.3)] bg-transparent hover:border-[var(--askmira-primary)] transition-all duration-300"
+                          style={{
+                            color: detectorFile ? "var(--askmira-primary)" : "var(--askmira-text-muted)"
+                          }}
+                          data-testid="button-upload-file"
+                        >
+                          {detectorFile ? (
+                            <div className="flex items-center space-x-2">
+                              <Shield className="h-4 w-4" />
+                              <span className="font-mono text-sm">{detectorFile.name}</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-2">
+                              <Plus className="h-4 w-4" />
+                              <span className="font-mono text-sm">UPLOAD .DOCX FILE</span>
+                            </div>
+                          )}
+                        </Button>
+                        {detectorFile && (
+                          <p className="text-xs font-mono text-[var(--askmira-primary)] opacity-70 text-center">
+                            File selected: {detectorFile.name}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex space-x-3 pt-4">
+                        <Button
+                          onClick={handleDetectorSubmit}
+                          disabled={isDetecting || (!detectorText.trim() && !detectorFile)}
+                          className="flex-1 py-3 px-6 rounded-lg font-mono text-sm transition-all duration-300"
+                          style={{
+                            background: isDetecting || (!detectorText.trim() && !detectorFile) 
+                              ? "rgba(128, 128, 128, 0.3)" 
+                              : "linear-gradient(135deg, rgba(0, 214, 172, 1) 0%, rgba(0, 180, 144, 1) 100%)",
+                            border: "1px solid rgba(0, 214, 172, 0.5)",
+                            boxShadow: isDetecting || (!detectorText.trim() && !detectorFile) 
+                              ? "none" 
+                              : "0 4px 25px rgba(0, 214, 172, 0.4)",
+                            color: "white"
+                          }}
+                          data-testid="button-analyze-content"
+                        >
+                          {isDetecting ? (
+                            <div className="flex items-center space-x-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              <span>ANALYZING...</span>
+                            </div>
+                          ) : (
+                            "ANALYZE CONTENT"
+                          )}
+                        </Button>
+                        
+                        {(detectorText.trim() || detectorFile || detectorResult) && (
+                          <Button
+                            onClick={clearDetectorInput}
+                            className="py-3 px-6 rounded-lg font-mono text-sm border border-[rgba(255,255,255,0.2)] bg-transparent hover:bg-[rgba(255,255,255,0.1)] transition-all duration-300"
+                            style={{ color: "var(--askmira-text-muted)" }}
+                            data-testid="button-clear-input"
+                          >
+                            CLEAR
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Corner accent lines */}
+                  <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                  <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                  <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                  <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
+                </div>
+
+                {/* Results Section */}
+                {detectorResult && (
+                  <div className="askmira-upload-area relative group">
+                    {/* Neural connection grid background */}
+                    <div className="neural-connection-grid"></div>
+                    
+                    <div className="relative z-10 p-6">
+                      <div className="text-center space-y-6">
+                        <div className="flex items-center justify-center space-x-3 mb-4">
+                          <Shield 
+                            className="h-6 w-6" 
+                            style={{ color: "var(--askmira-primary)" }} 
+                          />
+                          <h3 className="text-lg font-mono" style={{ color: "var(--askmira-primary)" }}>
+                            ANALYSIS RESULTS
+                          </h3>
+                        </div>
+
+                        {/* Probability Bar */}
+                        <div className="space-y-4">
+                          <div className="text-center">
+                            <div className="text-3xl font-mono font-bold mb-2" 
+                                 style={{ 
+                                   color: detectorResult.probability > 50 ? "#ef4444" : "#22c55e" 
+                                 }}>
+                              {detectorResult.probability.toFixed(1)}%
+                            </div>
+                            <div 
+                              className="inline-block px-4 py-2 rounded-lg font-mono text-sm font-bold"
+                              style={{
+                                backgroundColor: detectorResult.probability > 50 ? "#ef4444" : "#22c55e",
+                                color: "white"
+                              }}
+                            >
+                              {detectorResult.probability > 50 ? "AI-GENERATED" : "HUMAN-WRITTEN"}
+                            </div>
+                          </div>
+
+                          {/* Visual Progress Bar */}
+                          <div className="w-full max-w-md mx-auto">
+                            <div className="h-4 bg-[rgba(26,26,26,0.6)] rounded-full overflow-hidden border border-[rgba(0,212,170,0.2)]">
+                              <div 
+                                className="h-full transition-all duration-1000 ease-out"
+                                style={{
+                                  width: `${detectorResult.probability}%`,
+                                  background: detectorResult.probability > 50 
+                                    ? "linear-gradient(90deg, #ef4444, #dc2626)" 
+                                    : "linear-gradient(90deg, #22c55e, #16a34a)"
+                                }}
+                              />
+                            </div>
+                            <div className="flex justify-between text-xs font-mono text-[var(--askmira-text-muted)] mt-2">
+                              <span>0%</span>
+                              <span>50%</span>
+                              <span>100%</span>
+                            </div>
+                          </div>
+
+                          <p className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-70 max-w-md mx-auto">
+                            {detectorResult.probability > 50 
+                              ? "This content appears to be generated by artificial intelligence."
+                              : "This content appears to be written by a human."}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Corner accent lines */}
+                    <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[var(--askmira-primary)] opacity-30"></div>
+                    <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[var(--askmira-primary)] opacity-30"></div>
+                    <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30"></div>
+                    <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30"></div>
+                  </div>
+                )}
+              </div>
+            </div>
           ) : (
-            /* Upload Area for Other Modes */
+            /* Upload Area for Other Modes (MIRA) */
             <div className="flex items-center justify-center h-full">
               <div 
                 className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group blur-sm opacity-60 pointer-events-none"
