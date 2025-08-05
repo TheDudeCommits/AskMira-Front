@@ -623,7 +623,7 @@ export default function Home() {
         
 
         {/* Toggle Buttons */}
-        <div className="flex items-center justify-center gap-1 sm:gap-2 lg:gap-4 mb-6 md:mb-8 px-2 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center justify-center gap-1 sm:gap-2 lg:gap-4 md:mb-8 px-2 overflow-x-auto scrollbar-hide mt-[30px] mb-[30px]">
           <div className="flex gap-1 sm:gap-2 lg:gap-4">
             {modes.map((mode) => {
               const IconComponent = mode.icon;
