@@ -929,8 +929,8 @@ export default function Home() {
             </div>
           ) : activeMode === "detector" ? (
             /* AI Detector Interface */
-            <div className="flex items-center justify-center h-full">
-              <div className="w-full max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center justify-center h-full min-h-0 px-4 sm:px-6 lg:px-8">
+              <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 flex flex-col justify-center my-auto">
                 {/* Input Section */}
                 <div className="askmira-upload-area relative group">
                   {/* Neural connection grid background */}
@@ -939,7 +939,7 @@ export default function Home() {
                   {/* Floating particles */}
                   <div className="floating-particles"></div>
                   
-                  <div className="relative z-10 p-6 space-y-6">
+                  <div className="relative z-10 p-4 sm:p-6 lg:p-8 space-y-6">
                     <div className="text-center space-y-2 mb-6">
                       <div className="flex items-center justify-center space-x-3 mb-3">
                         <Shield 
@@ -1077,7 +1077,7 @@ export default function Home() {
                     {/* Neural connection grid background */}
                     <div className="neural-connection-grid"></div>
                     
-                    <div className="relative z-10 p-6">
+                    <div className="relative z-10 p-4 sm:p-6 lg:p-8">
                       <div className="text-center space-y-6">
                         <div className="flex items-center justify-center space-x-3 mb-4">
                           <Shield 
