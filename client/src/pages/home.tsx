@@ -209,15 +209,42 @@ export default function Home() {
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
-      // Get the audio response as blob
-      const audioResponseBlob = await response.blob();
-      console.log("Response audio blob:", audioResponseBlob.size, "bytes");
+      // Check content type to handle different response formats
+      const contentType = response.headers.get('content-type');
+      console.log("Response content type:", contentType);
       
-      const audioUrl = URL.createObjectURL(audioResponseBlob);
+      let audioUrl: string = "";
+      let responseText = "Mira is speaking...";
+      
+      if (contentType && contentType.includes('application/json')) {
+        // If JSON response, extract both audio and text
+        const jsonResponse = await response.json();
+        console.log("JSON response:", jsonResponse);
+        
+        if (jsonResponse.audio) {
+          // Convert base64 audio to blob
+          const audioBytes = atob(jsonResponse.audio);
+          const audioArray = new Uint8Array(audioBytes.length);
+          for (let i = 0; i < audioBytes.length; i++) {
+            audioArray[i] = audioBytes.charCodeAt(i);
+          }
+          const audioBlob = new Blob([audioArray], { type: 'audio/mpeg' });
+          audioUrl = URL.createObjectURL(audioBlob);
+        }
+        
+        if (jsonResponse.text) {
+          responseText = jsonResponse.text;
+        }
+      } else {
+        // If audio blob response (existing behavior)
+        const audioResponseBlob = await response.blob();
+        console.log("Response audio blob:", audioResponseBlob.size, "bytes");
+        audioUrl = URL.createObjectURL(audioResponseBlob);
+      }
       
       // Play the audio response and start video immediately
       setIsPlayingReply(true);
-      setCurrentSubtitle("Mira is speaking...");
+      setCurrentSubtitle(responseText);
       
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
@@ -248,7 +275,8 @@ export default function Home() {
       
     } catch (error) {
       console.error("Error sending voice message:", error);
-      alert(`Error processing voice message: ${error.message}. Please try again.`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Error processing voice message: ${errorMessage}. Please try again.`);
     } finally {
       setIsLoading(false);
     }
