@@ -516,9 +516,7 @@ export default function Home() {
             <div className="mb-4">
               <div className="flex items-center space-x-2 mb-2">
                 <div className="w-2 h-2 bg-[var(--askmira-primary)] rounded-full animate-pulse"></div>
-                <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">
-                  NEURAL CHAT SYSTEM
-                </span>
+                <span className="text-xs font-mono tracking-wider text-[var(--askmira-primary)] opacity-70">Mira Neural Interface</span>
               </div>
               <div className="text-xs font-mono text-[var(--askmira-text-muted)] opacity-50 mb-4">[INTERFACE_v0.01]</div>
             </div>
@@ -671,7 +669,7 @@ export default function Home() {
         <div className="flex-1 overflow-hidden">
           {activeMode === "text" ? (
             /* Chat Messages Area for Text Mode */
-            <div className="max-w-4xl mx-auto h-full flex flex-col px-4 sm:px-8">
+            (<div className="max-w-4xl mx-auto h-full flex flex-col px-4 sm:px-8">
               <div className="flex-1 overflow-y-auto py-4 space-y-4 max-h-[calc(100vh-280px)] chat-scroll">
                 {messages.length === 0 ? (
                   <div className="flex items-center justify-center h-full">
@@ -762,10 +760,10 @@ export default function Home() {
                 {/* Scroll anchor */}
                 <div ref={messagesEndRef} />
               </div>
-            </div>
+            </div>)
           ) : activeMode === "voice" ? (
             /* Voice Recording Interface */
-            <div className="flex items-center justify-center h-full relative">
+            (<div className="flex items-center justify-center h-full relative">
               {/* Mira Video - Only visible when playing reply */}
               {isPlayingReply && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center z-50 pointer-events-none">
@@ -838,7 +836,6 @@ export default function Home() {
                   )}
                 </div>
               )}
-              
               {/* Voice Recording Controls */}
               <div className={`askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group ${isPlayingReply ? 'z-10 opacity-10 blur-sm' : 'z-10'} transition-all duration-700`}>
                 {/* Neural connection grid background */}
@@ -919,17 +916,16 @@ export default function Home() {
                 <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
                 <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
               </div>
-              
               {/* Hidden audio element for playback */}
               <audio 
                 ref={audioRef} 
                 onEnded={handleAudioEnded}
                 style={{ display: 'none' }}
               />
-            </div>
+            </div>)
           ) : activeMode === "detector" ? (
             /* AI Detector Interface */
-            <div className="flex items-center justify-center min-h-full py-8">
+            (<div className="flex items-center justify-center min-h-full py-8">
               <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-6 lg:px-8">
                 {/* Input Section */}
                 <div className="askmira-upload-area relative group">
@@ -1146,10 +1142,10 @@ export default function Home() {
                   </div>
                 )}
               </div>
-            </div>
+            </div>)
           ) : (
             /* Upload Area for Other Modes (MIRA) */
-            <div className="flex items-center justify-center h-full px-4 sm:px-6 lg:px-8">
+            (<div className="flex items-center justify-center h-full px-4 sm:px-6 lg:px-8">
               <div 
                 className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group blur-sm opacity-60 pointer-events-none"
                 style={{ filter: 'blur(2px)' }}
@@ -1207,7 +1203,7 @@ export default function Home() {
                 <div className="absolute bottom-4 left-4 w-6 h-6 border-l-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
                 <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-[var(--askmira-primary)] opacity-30 transition-opacity duration-300 group-hover:opacity-60"></div>
               </div>
-            </div>
+            </div>)
           )}
         </div>
 
