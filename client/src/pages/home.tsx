@@ -929,8 +929,8 @@ export default function Home() {
             </div>
           ) : activeMode === "detector" ? (
             /* AI Detector Interface */
-            <div className="flex items-center justify-center h-full min-h-0 px-4 sm:px-6 lg:px-8">
-              <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6 flex flex-col justify-center my-auto">
+            <div className="flex items-center justify-center min-h-full px-4 sm:px-6 lg:px-8 py-8">
+              <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6">
                 {/* Input Section */}
                 <div className="askmira-upload-area relative group">
                   {/* Neural connection grid background */}
