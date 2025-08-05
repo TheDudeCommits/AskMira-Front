@@ -217,13 +217,19 @@ export default function Home() {
       // Play the audio response
       if (audioRef.current) {
         audioRef.current.src = audioUrl;
-        audioRef.current.play();
         setIsPlayingReply(true);
         
-        // Start the Mira video when audio plays
-        if (videoRef.current) {
-          videoRef.current.play();
-        }
+        // Start audio playback
+        audioRef.current.play().then(() => {
+          console.log("Audio started playing");
+          // Start the Mira video when audio plays successfully
+          if (videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play().then(() => {
+              console.log("Video started playing");
+            }).catch(e => console.error("Video play error:", e));
+          }
+        }).catch(e => console.error("Audio play error:", e));
       }
       
       // Clear audio chunks for next recording
@@ -607,20 +613,32 @@ export default function Home() {
             <div className="flex items-center justify-center h-full relative">
               {/* Mira Video - Only visible when playing reply */}
               {isPlayingReply && (
-                <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
                   <video 
                     ref={videoRef}
                     src={miraVideo}
                     loop
                     muted
-                    className="max-h-full max-w-full object-contain"
-                    style={{ filter: 'drop-shadow(0 0 30px rgba(0, 212, 170, 0.5))' }}
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-cover"
+                    style={{ 
+                      filter: 'drop-shadow(0 0 30px rgba(0, 212, 170, 0.5))',
+                      mixBlendMode: 'normal',
+                      transform: 'scale(1.2)'
+                    }}
+                    onLoadedData={() => {
+                      console.log("Video loaded, playing:", isPlayingReply);
+                      if (videoRef.current && isPlayingReply) {
+                        videoRef.current.play().catch(e => console.error("Video play error:", e));
+                      }
+                    }}
                   />
                 </div>
               )}
               
               {/* Voice Recording Controls */}
-              <div className="askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group z-10">
+              <div className={`askmira-upload-area w-full max-w-3xl h-56 sm:h-72 flex flex-col items-center justify-center relative group ${isPlayingReply ? 'z-10 opacity-20' : 'z-10'} transition-opacity duration-500`}>
                 {/* Neural connection grid background */}
                 <div className="neural-connection-grid"></div>
                 
