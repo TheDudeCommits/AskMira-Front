@@ -22,27 +22,6 @@ import miraVideo from "@assets/Mira Vertical No Background 2_1754353314687.mp4";
 
 type Mode = "text" | "voice" | "mira" | "detector";
 
-// Message formatting function for better readability
-const formatMessage = (text: string): string => {
-  return text
-    // Convert double asterisks to bold
-    .replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--askmira-primary); font-weight: 600;">$1</strong>')
-    // Convert single asterisks to italic
-    .replace(/\*(.*?)\*/g, '<em style="color: var(--askmira-text); font-style: italic;">$1</em>')
-    // Convert numbered lists
-    .replace(/^(\d+)\.\s+(.+)$/gm, '<div style="margin: 8px 0; padding-left: 8px;"><span style="color: var(--askmira-primary); font-weight: bold;">$1.</span> $2</div>')
-    // Convert bullet points
-    .replace(/^[-•*]\s+(.+)$/gm, '<div style="margin: 4px 0; padding-left: 8px;"><span style="color: var(--askmira-primary);">•</span> $1</div>')
-    // Convert double line breaks to paragraph breaks
-    .replace(/\n\n/g, '</p><p style="margin: 12px 0;">')
-    // Convert single line breaks to br tags
-    .replace(/\n/g, '<br/>')
-    // Wrap in paragraph tags if content exists
-    .replace(/^(.+)/, '<p style="margin: 0;">$1</p>')
-    // Clean up empty paragraphs
-    .replace(/<p[^>]*><\/p>/g, '');
-};
-
 export default function Home() {
   const [activeMode, setActiveMode] = useState<Mode>("text");
   const [searchQuery, setSearchQuery] = useState("");
@@ -333,9 +312,11 @@ export default function Home() {
       // Clear audio chunks for next recording
       setAudioChunks([]);
       
-    } catch (error) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unexpected error";
       console.error("Error sending voice message:", error);
-      alert(`Error processing voice message: ${error.message}. Please try again.`);
+      alert(`Error processing voice message: ${errorMessage}. Please try again.`);
     } finally {
       setIsLoading(false);
     }
@@ -728,12 +709,11 @@ export default function Home() {
                           whiteSpace: 'pre-wrap'
                         }}
                       >
-                        <div 
+                        <div
                           className={`message-content ${message.isUser ? 'font-mono' : 'font-sans'}`}
-                          dangerouslySetInnerHTML={{ 
-                            __html: formatMessage(message.text) 
-                          }}
-                        />
+                        >
+                          {message.text}
+                        </div>
                       </div>
                     </div>
                   ))

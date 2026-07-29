@@ -5,8 +5,16 @@ import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
+import { rateLimit } from "express-rate-limit";
 
 const viteLogger = createLogger();
+
+export function sanitizeLogField(value: string): string {
+  return value.replace(
+    /[\u0000-\u001f\u007f-\u009f]/g,
+    (character) => `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`,
+  );
+}
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -16,7 +24,24 @@ export function log(message: string, source = "express") {
     hour12: true,
   });
 
-  console.log(`${formattedTime} [${source}] ${message}`);
+  console.log(
+    "%s [%s] %s",
+    formattedTime,
+    sanitizeLogField(source),
+    sanitizeLogField(message),
+  );
+}
+
+export function createHtmlRequestLimiter(
+  options: { windowMs?: number; limit?: number } = {},
+) {
+  return rateLimit({
+    windowMs: options.windowMs ?? 15 * 60 * 1000,
+    limit: options.limit ?? 300,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: "Too many page requests. Please try again later.",
+  });
 }
 
 export async function setupVite(app: Express, server: Server) {
@@ -41,7 +66,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  app.use("*", createHtmlRequestLimiter(), async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
@@ -79,7 +104,7 @@ export function serveStatic(app: Express) {
   app.use(express.static(distPath));
 
   // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  app.use("*", createHtmlRequestLimiter(), (_req, res) => {
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
