@@ -21,10 +21,11 @@ export function log(message: string, source = "express") {
   });
 
   console.log(
-    "%s [%s] %s",
-    formattedTime,
-    sanitizeLogField(source),
-    sanitizeLogField(message),
+    JSON.stringify({
+      time: formattedTime,
+      source: sanitizeLogField(source),
+      message: sanitizeLogField(message),
+    }),
   );
 }
 

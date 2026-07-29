@@ -4,6 +4,7 @@ import test from "node:test";
 import express from "express";
 import {
   createHtmlRequestLimiter,
+  log,
   sanitizeLogField,
 } from "./vite";
 
@@ -11,6 +12,36 @@ test("sanitizeLogField renders control characters inert", () => {
   assert.equal(
     sanitizeLogField("first\r\nforged\u0000entry"),
     "first\\u000d\\u000aforged\\u0000entry",
+  );
+});
+
+test("log emits untrusted fields as one structured JSON record", () => {
+  const originalConsoleLog = console.log;
+  const records: unknown[][] = [];
+  console.log = (...values: unknown[]) => {
+    records.push(values);
+  };
+
+  try {
+    log("first\r\nforged", "remote\nsource");
+  } finally {
+    console.log = originalConsoleLog;
+  }
+
+  assert.equal(records.length, 1);
+  assert.equal(records[0].length, 1);
+  assert.equal(typeof records[0][0], "string");
+  assert.doesNotMatch(records[0][0] as string, /[\r\n]/);
+  assert.deepEqual(
+    Object.fromEntries(
+      Object.entries(JSON.parse(records[0][0] as string)).filter(
+        ([key]) => key !== "time",
+      ),
+    ),
+    {
+      source: "remote\\u000asource",
+      message: "first\\u000d\\u000aforged",
+    },
   );
 });
 
