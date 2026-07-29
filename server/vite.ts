@@ -1,13 +1,9 @@
 import express, { type Express } from "express";
+import { randomUUID } from "node:crypto";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
-import { nanoid } from "nanoid";
 import { rateLimit } from "express-rate-limit";
-
-const viteLogger = createLogger();
 
 export function sanitizeLogField(value: string): string {
   return value.replace(
@@ -45,6 +41,13 @@ export function createHtmlRequestLimiter(
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Vite and its config are development-only. Load them only when this
+  // development path runs so the production server can omit devDependencies.
+  const viteConfigModule = "../vite.config";
+  const [{ createServer: createViteServer, createLogger }, { default: viteConfig }] =
+    await Promise.all([import("vite"), import(viteConfigModule)]);
+  const viteLogger = createLogger();
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
@@ -81,7 +84,7 @@ export async function setupVite(app: Express, server: Server) {
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`,
+        `src="/src/main.tsx?v=${randomUUID()}"`,
       );
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
